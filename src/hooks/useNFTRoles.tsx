@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { 
@@ -5,9 +6,7 @@ import {
   fetchNFTsForAddress, 
   getPrimaryRole, 
   NFTClass, 
-  ResistanceNFT,
-  RESISTANCE_NFT_ADDRESS,
-  getNFTBalanceByContract
+  ResistanceNFT 
 } from '@/services/alchemyService';
 
 interface NFTRolesState {
@@ -18,11 +17,6 @@ interface NFTRolesState {
   isSurvivor: boolean;
   isBountyHunter: boolean;
   nfts: ResistanceNFT[];
-  counts: {
-    sentinel: number;
-    survivor: number;
-    bountyHunter: number;
-  };
   refetch: () => Promise<void>;
 }
 
@@ -32,11 +26,6 @@ export const useNFTRoles = (): NFTRolesState => {
   const [error, setError] = useState<Error | null>(null);
   const [primaryRole, setPrimaryRole] = useState<NFTClass>('Unknown');
   const [nfts, setNfts] = useState<ResistanceNFT[]>([]);
-  const [counts, setCounts] = useState({
-    sentinel: 0,
-    survivor: 0,
-    bountyHunter: 0
-  });
   
   const fetchData = async () => {
     if (!primaryWallet?.address) {
@@ -51,17 +40,6 @@ export const useNFTRoles = (): NFTRolesState => {
       // Fetch all NFTs
       const fetchedNfts = await fetchNFTsForAddress(primaryWallet.address);
       setNfts(fetchedNfts);
-      
-      // Count NFTs by class
-      const sentinelCount = fetchedNfts.filter(nft => nft.class === 'Sentinel').length;
-      const survivorCount = fetchedNfts.filter(nft => nft.class === 'Survivor').length;
-      const bountyHunterCount = fetchedNfts.filter(nft => nft.class === 'Bounty Hunter').length;
-      
-      setCounts({
-        sentinel: sentinelCount,
-        survivor: survivorCount,
-        bountyHunter: bountyHunterCount
-      });
       
       // Determine primary role
       const role = await getPrimaryRole(primaryWallet.address);
@@ -86,7 +64,6 @@ export const useNFTRoles = (): NFTRolesState => {
     isSurvivor: primaryRole === 'Survivor',
     isBountyHunter: primaryRole === 'Bounty Hunter',
     nfts,
-    counts,
     refetch: fetchData
   };
 };

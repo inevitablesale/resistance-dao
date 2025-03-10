@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { Target, BadgeDollarSign, TrendingUp, Users, ArrowRight, Clock, Award, BarChart, FileText, Zap, Globe, Code, MessageSquare, Wallet } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle } from "@/components/ui/toxic-card";
@@ -7,10 +8,6 @@ import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useToast } from "@/hooks/use-toast";
-import { useNFTRoles } from "@/hooks/useNFTRoles";
-import { NFTClass } from "@/services/nftService";
 
 interface BountyCategory {
   title: string;
@@ -31,24 +28,13 @@ interface BountyCategory {
 
 export const BountyHunterHub: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { isConnected, connect } = useWalletConnection();
-  const { primaryRole, counts, isLoading: isRolesLoading } = useNFTRoles();
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('reward');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [isJoiningPool, setIsJoiningPool] = useState<string | null>(null);
   
-  const hunterLevel = (() => {
-    if (counts.sentinel > 0) return 4;
-    if (counts.bountyHunter > 1) return 3;
-    if (counts.bountyHunter > 0) return 2;
-    if (counts.survivor > 0) return 1;
-    return 0;
-  })();
-  
+  // Mock hunter stats
   const hunterStats = {
-    level: hunterLevel,
+    level: 2,
     reputation: 78,
     totalEarned: "$325",
     successRate: 87,
@@ -229,14 +215,17 @@ export const BountyHunterHub: React.FC = () => {
     }
   ];
   
+  // Filter bounties based on selected difficulty and category
   const filteredBounties = bountyCategories.filter(b => {
     const difficultyMatch = filterDifficulty === 'all' || b.difficulty === filterDifficulty;
     const categoryMatch = activeCategory === 'all' || b.category === activeCategory;
     return difficultyMatch && categoryMatch;
   });
     
+  // Sort bounties based on selected criteria
   const sortedBounties = [...filteredBounties].sort((a, b) => {
     if (sortBy === 'reward') {
+      // Simple sorting, would need more complex logic for actual implementation
       return b.reward.length - a.reward.length;
     } else if (sortBy === 'difficulty') {
       const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3 };
@@ -247,29 +236,10 @@ export const BountyHunterHub: React.FC = () => {
     return 0;
   });
   
-  const handleViewOpportunities = async (category: BountyCategory) => {
-    if (!isConnected) {
-      toast({
-        title: "Wallet Required",
-        description: "Connect your wallet to view bounty opportunities",
-        variant: "default"
-      });
-      
-      try {
-        await connect();
-      } catch (error) {
-        console.error("Failed to connect wallet:", error);
-        return;
-      }
-      return;
-    }
-    
+  // Handler for bounty selection
+  const handleViewOpportunities = (category: BountyCategory) => {
     if (hunterStats.level < category.requiredLevel) {
-      toast({
-        title: "Level Requirement",
-        description: `You need to be level ${category.requiredLevel} to access this bounty type`,
-        variant: "destructive"
-      });
+      // Cannot proceed due to level requirement
       return;
     }
     
@@ -278,43 +248,17 @@ export const BountyHunterHub: React.FC = () => {
     } else if (category.action.startsWith('settlements/')) {
       navigate(`/${category.action}`);
     }
-    
-    setIsJoiningPool(category.title);
-    try {
-      // Party Protocol contract interaction code will go here
-      // await joinPartyPool(category.partyType, category.title);
-      toast({
-        title: "Success",
-        description: `You've joined the ${category.title} party pool`,
-        variant: "default"
-      });
-    } catch (error) {
-      console.error("Failed to join party pool:", error);
-      toast({
-        title: "Failed to Join",
-        description: "There was an error joining the party pool",
-        variant: "destructive"
-      });
-    } finally {
-      setIsJoiningPool(null);
-    }
   };
   
   return (
     <div className="space-y-8">
+      {/* Hunter Stats Dashboard */}
       <ToxicCard className="bg-gray-900/60 border border-toxic-neon/40">
         <ToxicCardHeader>
           <div className="flex justify-between items-center">
             <ToxicCardTitle>Bounty Hunter Dashboard</ToxicCardTitle>
             <span className="text-toxic-neon font-mono text-sm px-3 py-1 rounded-full bg-black/60 border border-toxic-neon/40">
-              {isRolesLoading ? (
-                <span className="flex items-center gap-2">
-                  <span className="animate-spin h-3 w-3 border-2 border-toxic-neon border-t-transparent rounded-full"></span>
-                  Loading...
-                </span>
-              ) : (
-                `Level ${hunterStats.level} Hunter`
-              )}
+              Level {hunterStats.level} Hunter
             </span>
           </div>
         </ToxicCardHeader>
@@ -361,6 +305,7 @@ export const BountyHunterHub: React.FC = () => {
         </ToxicCardContent>
       </ToxicCard>
       
+      {/* Bounty Filtering and Sorting */}
       <div className="space-y-4">
         <Tabs defaultValue="all" onValueChange={setActiveCategory}>
           <TabsList className="bg-gray-900/30 p-1 border border-gray-800 mb-4">
@@ -431,6 +376,7 @@ export const BountyHunterHub: React.FC = () => {
             </div>
           </div>
           
+          {/* Bounty Listings */}
           <TabsContent value={activeCategory} className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {sortedBounties.map((category, index) => (
@@ -510,18 +456,11 @@ export const BountyHunterHub: React.FC = () => {
                       className="w-full justify-between"
                       variant="outline"
                       onClick={() => handleViewOpportunities(category)}
-                      disabled={hunterStats.level < category.requiredLevel || isJoiningPool === category.title}
+                      disabled={hunterStats.level < category.requiredLevel}
                     >
-                      {isJoiningPool === category.title ? (
-                        <span className="flex items-center gap-2">
-                          <span className="animate-spin h-4 w-4 border-2 border-toxic-neon border-t-transparent rounded-full"></span>
-                          Joining Pool...
-                        </span>
-                      ) : hunterStats.level < category.requiredLevel ? (
-                        `Requires Level ${category.requiredLevel}`
-                      ) : (
-                        "View Opportunities"
-                      )}
+                      {hunterStats.level < category.requiredLevel ? 
+                        `Requires Level ${category.requiredLevel}` : 
+                        "View Opportunities"}
                       <ArrowRight className="h-4 w-4" />
                     </ToxicButton>
                   </CardFooter>

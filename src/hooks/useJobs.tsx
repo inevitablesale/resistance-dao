@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "./use-toast";
 import {
   NFTClass,
   getPrimaryRole
-} from "@/services/nftService";
+} from "@/services/alchemyService";
+import { JobMetadata } from "@/utils/settlementConversion";
+import { JobCategory } from "@/components/jobs/JobCategoryIcon";
 
 // Mock job data until we implement the real backend services
 const mockJobs: (JobMetadata & { id: string })[] = [

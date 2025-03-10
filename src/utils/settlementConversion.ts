@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalEvent, ProposalMetadata } from "@/types/proposals";
 import { NFTClass } from "@/services/alchemyService";
