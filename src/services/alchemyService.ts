@@ -1,5 +1,5 @@
 
-import { createPublicClient, http, PublicClient, getContract } from "viem";
+import { createPublicClient, http, getContract, type GetContractReturnType } from "viem";
 import { polygon } from "viem/chains";
 
 // NFT Contract addresses for Resistance DAO roles
@@ -51,7 +51,10 @@ const NFT_ABI = [
     "stateMutability": "view",
     "type": "function"
   }
-] as const; // Add const assertion here
+] as const; // Const assertion is important for proper typing
+
+// Type for the NFT contract
+type NFTContract = GetContractReturnType<typeof NFT_ABI>;
 
 // Create Viem public client
 const client = createPublicClient({
@@ -64,11 +67,11 @@ const client = createPublicClient({
  * @param contractAddress The NFT contract address
  * @returns Contract instance
  */
-const getNFTContract = (contractAddress: string) => {
+const getNFTContract = (contractAddress: string): NFTContract => {
   return getContract({
     address: contractAddress as `0x${string}`,
     abi: NFT_ABI,
-    client
+    publicClient: client
   });
 };
 
