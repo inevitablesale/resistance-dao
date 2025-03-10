@@ -1,6 +1,17 @@
 
 import { Building, Pickaxe, Shield, Cpu, GalleryVertical, Crosshair, BarChart4, Code, Trash2, HelpCircle } from "lucide-react";
-import { JobCategory } from "@/services/jobService";
+
+export type JobCategory = 
+  | 'settlement-building' 
+  | 'resource-gathering' 
+  | 'security' 
+  | 'technology' 
+  | 'governance' 
+  | 'scouting' 
+  | 'trading' 
+  | 'protocol-development' 
+  | 'waste-management' 
+  | 'other';
 
 interface JobCategoryIconProps {
   category: JobCategory;

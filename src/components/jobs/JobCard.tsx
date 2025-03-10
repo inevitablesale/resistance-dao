@@ -47,7 +47,7 @@ export const JobCard: React.FC<JobCardProps> = ({
     <Card className="overflow-hidden border border-slate-200 h-full flex flex-col hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start mb-2">
-          <JobCategoryIcon category={job.category} className="h-8 w-8 text-primary" />
+          <JobCategoryIcon category={job.category as any} className="h-8 w-8 text-primary" />
           <Badge className={`${getStatusColor(job.status || 'open')} text-white`}>
             {job.status || 'Open'}
           </Badge>

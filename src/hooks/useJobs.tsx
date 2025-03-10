@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -5,22 +6,114 @@ import { ethers } from "ethers";
 import { useToast } from "./use-toast";
 import {
   NFTClass,
-  getPrimaryRole,
-  getNFTsForOwner,
+  getPrimaryRole
 } from "@/services/alchemyService";
-import {
-  createJobListing,
-  getJobs,
-  Job,
-  applyForJob,
-  getJobApplicants,
-  JobApplicant,
-  approveJobApplicant,
-  rejectJobApplicant,
-  completeJob,
-  cancelJob,
-} from "@/services/jobService";
 import { JobMetadata } from "@/utils/settlementConversion";
+import { JobCategory } from "@/components/jobs/JobCategoryIcon";
+
+// Mock job data until we implement the real backend services
+const mockJobs: (JobMetadata & { id: string })[] = [
+  {
+    id: "job-1",
+    title: "Harvest Resources from Abandoned Factory",
+    description: "We need skilled resource gatherers to extract valuable materials from a recently discovered abandoned factory. The location is relatively safe but requires experience in identifying valuable resources.",
+    category: "resource-gathering",
+    reward: "0.5 ETH",
+    deadline: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days from now
+    maxApplicants: 3,
+    referralReward: "0.05 ETH",
+    votingDuration: 604800,
+    linkedInURL: "",
+    creator: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    status: "open",
+    applicants: []
+  },
+  {
+    id: "job-2",
+    title: "Settlement Security Patrol",
+    description: "Looking for experienced guards to patrol the settlement perimeter. Must have previous security experience and be willing to work night shifts.",
+    category: "security",
+    reward: "0.3 ETH",
+    deadline: Date.now() + 1000 * 60 * 60 * 24 * 14, // 14 days from now
+    maxApplicants: 5,
+    referralReward: "0.03 ETH",
+    votingDuration: 604800,
+    linkedInURL: "",
+    creator: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    status: "open",
+    applicants: []
+  },
+  {
+    id: "job-3",
+    title: "Smart Contract Development for Water Management",
+    description: "We need a skilled developer to create a smart contract system for managing water distribution in our settlement. Experience with Solidity required.",
+    category: "protocol-development",
+    reward: "1.2 ETH",
+    deadline: Date.now() + 1000 * 60 * 60 * 24 * 10, // 10 days from now
+    maxApplicants: 2,
+    referralReward: "0.1 ETH",
+    votingDuration: 604800,
+    linkedInURL: "",
+    creator: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+    status: "open",
+    applicants: []
+  }
+];
+
+export interface JobApplicant {
+  address: string;
+  appliedAt: number;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+// Mock function to get jobs
+const getJobs = async (): Promise<(JobMetadata & { id: string })[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return mockJobs;
+};
+
+// Mock function to apply for a job
+const applyForJob = async (wallet: any, jobId: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return true;
+};
+
+// Mock function to get job applicants
+const getJobApplicants = async (jobId: string): Promise<JobApplicant[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return [];
+};
+
+// Mock function to approve job applicant
+const approveJobApplicant = async (wallet: any, jobId: string, applicantAddress: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return true;
+};
+
+// Mock function to reject job applicant
+const rejectJobApplicant = async (wallet: any, jobId: string, applicantAddress: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return true;
+};
+
+// Mock function to complete job
+const completeJob = async (wallet: any, jobId: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return true;
+};
+
+// Mock function to cancel job
+const cancelJob = async (wallet: any, jobId: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return true;
+};
 
 export const useJobs = () => {
   const { toast } = useToast();
@@ -72,10 +165,10 @@ export const useJobs = () => {
       return null;
     }
 
-    if (userRole !== "Settlement Owner") {
+    if (userRole !== "Sentinel") {
       toast({
         title: "Access Denied",
-        description: "Only Settlement Owners can create jobs.",
+        description: "Only Sentinels can create jobs.",
         variant: "destructive",
       });
       return null;
@@ -99,21 +192,18 @@ export const useJobs = () => {
         creator: address, // This is now allowed in JobMetadata
       };
 
-      const jobId = await createJobListing(wallet, metadata);
+      // For now, simply add to the mock data
+      const jobId = `job-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      toast({
+        title: "Job Created",
+        description: "Your job listing has been created successfully.",
+      });
 
-      if (jobId) {
-        toast({
-          title: "Job Created",
-          description: "Your job listing has been created successfully.",
-        });
+      // Refresh jobs list
+      refetchJobs();
 
-        // Refresh jobs list
-        refetchJobs();
-
-        return jobId;
-      }
-
-      return null;
+      return jobId;
     } catch (error) {
       console.error("Error creating job:", error);
       toast({
@@ -201,10 +291,10 @@ export const useJobs = () => {
       return false;
     }
 
-    if (userRole !== "Settlement Owner") {
+    if (userRole !== "Sentinel") {
       toast({
         title: "Access Denied",
-        description: "Only Settlement Owners can approve job applicants.",
+        description: "Only Sentinels can approve job applicants.",
         variant: "destructive",
       });
       return false;
@@ -256,10 +346,10 @@ export const useJobs = () => {
       return false;
     }
 
-    if (userRole !== "Settlement Owner") {
+    if (userRole !== "Sentinel") {
       toast({
         title: "Access Denied",
-        description: "Only Settlement Owners can reject job applicants.",
+        description: "Only Sentinels can reject job applicants.",
         variant: "destructive",
       });
       return false;
@@ -311,10 +401,10 @@ export const useJobs = () => {
       return false;
     }
 
-    if (userRole !== "Settlement Owner") {
+    if (userRole !== "Sentinel") {
       toast({
         title: "Access Denied",
-        description: "Only Settlement Owners can complete jobs.",
+        description: "Only Sentinels can complete jobs.",
         variant: "destructive",
       });
       return false;
@@ -365,10 +455,10 @@ export const useJobs = () => {
       return false;
     }
 
-    if (userRole !== "Settlement Owner") {
+    if (userRole !== "Sentinel") {
       toast({
         title: "Access Denied",
-        description: "Only Settlement Owners can cancel jobs.",
+        description: "Only Sentinels can cancel jobs.",
         variant: "destructive",
       });
       return false;

@@ -30,6 +30,9 @@ export const JobsDashboard = () => {
     (job.applicants && job.applicants.includes(userRole))
   );
 
+  // Check if user is a Settlement Owner (Sentinel)
+  const isSettlementOwner = primaryRole === 'Sentinel';
+
   return (
     <div className="container mx-auto p-4 mt-8">
       <div className="flex flex-col md:flex-row justify-between items-start mb-8">
@@ -38,7 +41,7 @@ export const JobsDashboard = () => {
           <p className="text-gray-600">Find work or post jobs for settlement activities</p>
         </div>
         
-        {primaryRole === 'Settlement Owner' && (
+        {isSettlementOwner && (
           <Dialog>
             <DialogTrigger asChild>
               <Button className="mt-4 md:mt-0">Post a New Job</Button>

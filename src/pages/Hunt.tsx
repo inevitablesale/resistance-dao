@@ -9,7 +9,7 @@ import { Settlement } from "@/utils/settlementConversion";
 
 export const Hunt = () => {
   const { primaryRole, isLoading: isLoadingRoles } = useNFTRoles();
-  const { settlements, isLoading: isLoadingSettlements } = useSettlements();
+  const { settlements, loading: isLoadingSettlements } = useSettlements();
 
   if (isLoadingRoles) {
     return (
