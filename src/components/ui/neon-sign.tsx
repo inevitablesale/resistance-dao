@@ -133,7 +133,7 @@ export const NeonSign = ({
       ) : (
         // Two-line display
         <>
-          <h1 className="text-5xl md:text-7xl tracking-wider mb-0 md:mb-1 leading-tight">
+          <h1 className="text-5xl md:text-7xl tracking-wider mb-2 leading-tight">
             {renderNeonText(firstLine)}
           </h1>
           <h1 className="text-5xl md:text-7xl tracking-wider leading-tight">
