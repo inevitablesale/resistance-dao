@@ -4,7 +4,7 @@ import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
 import { createParty, PartyOptions, createEthCrowdfund, CrowdfundOptions } from "./partyProtocolService";
 import { toast } from "@/hooks/use-toast";
-import * as supabaseClient from "./supabaseClient"; // Import all functions from supabaseClient
+import { supabase } from "./supabaseClient";
 
 // Bounty Protocol addresses
 const BOUNTY_FACTORY_ADDRESS = "0x4a5EA76571F47E7d92B5040E8C7FF12eacd35087"; // Polygon mainnet
@@ -53,7 +53,9 @@ export async function createBounty(options: BountyOptions): Promise<Bounty | nul
   try {
     console.log("Creating bounty with options:", options);
     
-    // Create the bounty object
+    // For now, we'll create a mock bounty
+    // In the real implementation, this would create a Party for the bounty
+    
     const bountyId = `b-${Date.now().toString(36)}`;
     const now = Math.floor(Date.now() / 1000);
     
@@ -73,15 +75,20 @@ export async function createBounty(options: BountyOptions): Promise<Bounty | nul
       hunterCount: 0
     };
     
-    // Store in supabase or localStorage fallback
-    const createdBounty = await supabaseClient.createBounty(bounty);
+    // Store in Supabase
+    const { data, error } = await supabase
+      .from('bounties')
+      .insert([bounty])
+      .select()
+      .single();
     
-    if (!createdBounty) {
-      throw new Error("Failed to create bounty");
+    if (error) {
+      console.error("Error storing bounty in Supabase:", error);
+      throw new Error(error.message);
     }
     
-    console.log("Bounty created successfully:", createdBounty);
-    return createdBounty as Bounty;
+    console.log("Bounty created successfully:", data);
+    return data as Bounty;
   } catch (error) {
     console.error("Error creating bounty:", error);
     throw new ProposalError({
@@ -103,7 +110,21 @@ export async function createBounty(options: BountyOptions): Promise<Bounty | nul
  */
 export async function getBounties(status?: string): Promise<Bounty[]> {
   try {
-    return await supabaseClient.getBounties(status);
+    let query = supabase.from('bounties').select('*');
+    
+    // Filter by status if provided
+    if (status) {
+      query = query.eq('status', status);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error("Error fetching bounties:", error);
+      return [];
+    }
+    
+    return data as Bounty[];
   } catch (error) {
     console.error("Error fetching bounties:", error);
     return [];
@@ -117,7 +138,18 @@ export async function getBounties(status?: string): Promise<Bounty[]> {
  */
 export async function getBounty(bountyId: string): Promise<Bounty | null> {
   try {
-    return await supabaseClient.getBounty(bountyId);
+    const { data, error } = await supabase
+      .from('bounties')
+      .select('*')
+      .eq('id', bountyId)
+      .single();
+    
+    if (error) {
+      console.error("Error fetching bounty:", error);
+      return null;
+    }
+    
+    return data as Bounty;
   } catch (error) {
     console.error("Error fetching bounty:", error);
     return null;
@@ -132,22 +164,19 @@ export async function getBounty(bountyId: string): Promise<Bounty | null> {
  */
 export async function updateBountyStatus(bountyId: string, status: "active" | "paused" | "expired" | "completed"): Promise<Bounty | null> {
   try {
-    // Get current bounty
-    const bounty = await supabaseClient.getBounty(bountyId);
-    if (!bounty) {
-      throw new Error("Bounty not found");
+    const { data, error } = await supabase
+      .from('bounties')
+      .update({ status })
+      .eq('id', bountyId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error("Error updating bounty status:", error);
+      return null;
     }
     
-    // Update status
-    const updatedBounty = {
-      ...bounty,
-      status
-    };
-    
-    // Save updated bounty
-    await supabaseClient.createBounty(updatedBounty);
-    
-    return updatedBounty;
+    return data as Bounty;
   } catch (error) {
     console.error("Error updating bounty status:", error);
     return null;
@@ -168,7 +197,7 @@ export async function recordSuccessfulReferral(
 ): Promise<Bounty | null> {
   try {
     // Get the current bounty
-    const bounty = await supabaseClient.getBounty(bountyId);
+    const bounty = await getBounty(bountyId);
     
     if (!bounty) {
       throw new Error("Bounty not found");
@@ -180,30 +209,171 @@ export async function recordSuccessfulReferral(
     }
     
     // Update the bounty
-    const updatedBounty = {
-      ...bounty,
+    const updatedValues = {
       usedBudget: bounty.usedBudget + bounty.rewardAmount,
       remainingBudget: bounty.remainingBudget - bounty.rewardAmount,
       successCount: bounty.successCount + 1
     };
     
-    // Save the updated bounty
-    await supabaseClient.createBounty(updatedBounty);
+    const { data, error } = await supabase
+      .from('bounties')
+      .update(updatedValues)
+      .eq('id', bountyId)
+      .select()
+      .single();
     
-    // Create the referral
-    const referralDate = new Date().toISOString();
-    await supabaseClient.createReferral({
-      bounty_id: bountyId,
-      referrer_address: referrerAddress,
-      referred_address: referredAddress,
-      referral_date: referralDate,
-      status: 'pending',
-      reward_amount: bounty.rewardAmount
-    });
+    if (error) {
+      console.error("Error updating bounty for referral:", error);
+      return null;
+    }
     
-    return updatedBounty;
+    // Record the referral in the referrals table
+    const { error: referralError } = await supabase
+      .from('referrals')
+      .insert([
+        {
+          bounty_id: bountyId,
+          referrer_address: referrerAddress,
+          referred_address: referredAddress,
+          reward_amount: bounty.rewardAmount,
+          status: 'completed',
+          completed_at: new Date().toISOString()
+        }
+      ]);
+    
+    if (referralError) {
+      console.error("Error recording referral:", referralError);
+    }
+    
+    return data as Bounty;
   } catch (error) {
     console.error("Error recording successful referral:", error);
     return null;
+  }
+}
+
+/**
+ * Deploy a bounty to the blockchain using Party Protocol
+ * @param bountyId ID of the bounty to deploy
+ * @param wallet Connected wallet
+ * @returns Promise resolving to transaction result with Party addresses
+ */
+export async function deployBountyToBlockchain(
+  bountyId: string, 
+  wallet: any
+): Promise<{ 
+  transactionHash: string; 
+  partyAddress: string;
+  crowdfundAddress: string;
+}> {
+  try {
+    // Fetch the bounty
+    const bounty = await getBounty(bountyId);
+    
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    console.log("Deploying bounty to blockchain:", bounty);
+    
+    // Get wallet data
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    const signerAddress = await signer.getAddress();
+    
+    // 1. Create a Party for the bounty
+    const partyOptions: PartyOptions = {
+      name: `Bounty: ${bounty.name}`,
+      hosts: [signerAddress],
+      votingDuration: 7 * 24 * 60 * 60, // 7 days in seconds
+      executionDelay: 24 * 60 * 60, // 1 day in seconds
+      passThresholdBps: 5000, // 50%
+      allowPublicProposals: false,
+      description: bounty.description,
+      metadataURI: ""
+    };
+    
+    toast({
+      title: "Creating Party for Bounty...",
+      description: "Please approve the transaction",
+    });
+    
+    const partyAddress = await createParty(wallet, partyOptions);
+    
+    // 2. Create a Crowdfund for the bounty
+    const crowdfundOptions: CrowdfundOptions = {
+      initialContributor: signerAddress,
+      minContribution: ethers.utils.parseEther("0.01").toString(), // 0.01 MATIC
+      maxContribution: ethers.utils.parseEther(bounty.totalBudget.toString()).toString(),
+      maxTotalContributions: ethers.utils.parseEther(bounty.totalBudget.toString()).toString(),
+      duration: bounty.expiresAt - Math.floor(Date.now() / 1000)
+    };
+    
+    toast({
+      title: "Setting Up Bounty Fund...",
+      description: "Please approve the transaction",
+    });
+    
+    const metadata = {
+      name: bounty.name,
+      description: bounty.description,
+      rewardAmount: bounty.rewardAmount,
+      rewardType: "fixed",
+      bountyType: "nft_referral"
+    };
+    
+    const crowdfundAddress = await createEthCrowdfund(
+      wallet, 
+      partyAddress, 
+      crowdfundOptions,
+      metadata
+    );
+    
+    // 3. Update the bounty with the contract addresses
+    const { data, error } = await supabase
+      .from('bounties')
+      .update({
+        partyAddress,
+        crowdfundAddress
+      })
+      .eq('id', bountyId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error("Error updating bounty with contract addresses:", error);
+    }
+    
+    toast({
+      title: "Bounty Deployed Successfully",
+      description: "Your bounty is now live on the blockchain",
+    });
+    
+    return {
+      transactionHash: `0x${Math.random().toString(36).substring(2, 15)}`, // mock tx hash, would be real in production
+      partyAddress,
+      crowdfundAddress
+    };
+  } catch (error) {
+    console.error("Error deploying bounty to blockchain:", error);
+    toast({
+      title: "Deployment Failed",
+      description: error instanceof Error ? error.message : "Unknown error occurred",
+      variant: "destructive"
+    });
+    throw new ProposalError({
+      category: 'contract',
+      message: 'Failed to deploy bounty to blockchain',
+      recoverySteps: [
+        'Check your wallet connection',
+        'Ensure you have enough MATIC for gas fees',
+        'Try again later'
+      ]
+    });
   }
 }

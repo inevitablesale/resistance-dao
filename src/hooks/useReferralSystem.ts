@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { supabase } from '@/services/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
-import * as supabaseClient from '@/services/supabaseClient';
 
 export type ReferralStatus = 'pending' | 'active' | 'completed' | 'rejected' | 'expired';
 
@@ -47,7 +47,21 @@ export function useReferralSystem(bountyId?: string) {
     setLoading(true);
     try {
       // Fetch all referrals where the current user is the referrer
-      const data = await supabaseClient.getReferrals(bountyId, primaryWallet.address);
+      let query = supabase
+        .from('bounty_referrals')
+        .select('*')
+        .eq('referrer_address', primaryWallet.address);
+        
+      // If a bountyId is provided, filter for that specific bounty
+      if (bountyId) {
+        query = query.eq('bounty_id', bountyId);
+      }
+      
+      const { data, error } = await query.order('referral_date', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
       
       if (data) {
         // Transform the data to match our interface
@@ -104,13 +118,14 @@ export function useReferralSystem(bountyId?: string) {
     
     try {
       // Check if referral already exists
-      const existingReferrals = await supabaseClient.getReferrals(bountyId, primaryWallet.address);
-      const alreadyReferred = existingReferrals.some(ref => 
-        ref.referrer_address === primaryWallet.address && 
-        ref.referred_address === referredAddress
-      );
-      
-      if (alreadyReferred) {
+      const { data: existingReferrals } = await supabase
+        .from('bounty_referrals')
+        .select('id')
+        .eq('bounty_id', bountyId)
+        .eq('referrer_address', primaryWallet.address)
+        .eq('referred_address', referredAddress);
+        
+      if (existingReferrals && existingReferrals.length > 0) {
         toast({
           title: 'Referral already exists',
           description: 'You have already referred this address for this bounty.',
@@ -120,12 +135,18 @@ export function useReferralSystem(bountyId?: string) {
       }
       
       // Create the new referral
-      await supabaseClient.createReferral({
-        bounty_id: bountyId,
-        referrer_address: primaryWallet.address,
-        referred_address: referredAddress,
-        status: 'pending'
-      });
+      const { error } = await supabase
+        .from('bounty_referrals')
+        .insert([{
+          bounty_id: bountyId,
+          referrer_address: primaryWallet.address,
+          referred_address: referredAddress,
+          status: 'pending'
+        }]);
+        
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: 'Referral created',
@@ -157,15 +178,30 @@ export function useReferralSystem(bountyId?: string) {
     }
   };
 
-  // Fetch referrals on component mount
+  // Subscribe to real-time updates for referrals
   useEffect(() => {
-    if (primaryWallet?.address) {
-      fetchReferrals();
+    if (!primaryWallet?.address) return;
+    
+    fetchReferrals();
+    
+    // Set up a real-time subscription
+    const subscription = supabase
+      .channel('bounty_referrals_changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'bounty_referrals',
+        filter: `referrer_address=eq.${primaryWallet.address}${bountyId ? `,bounty_id=eq.${bountyId}` : ''}`
+      }, () => {
+        // Refresh the data when we get updates
+        fetchReferrals();
+      })
+      .subscribe();
       
-      // Set up a polling mechanism to simulate real-time updates
-      const interval = setInterval(fetchReferrals, 15000);
-      return () => clearInterval(interval);
-    }
+    return () => {
+      // Clean up subscription when component unmounts
+      subscription.unsubscribe();
+    };
   }, [primaryWallet?.address, bountyId]);
 
   return {
