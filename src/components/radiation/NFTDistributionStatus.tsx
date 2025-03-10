@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
@@ -22,7 +21,6 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
   
   // Get the total claimed NFTs (from contract stats)
   const totalClaimed = contractStats?.totalMinted || 0;
-  console.log("Total claimed from contract stats:", totalClaimed);
   
   // Calculate the total NFT supply for all types
   const totalNFTs = TOTAL_SENTINELS + TOTAL_BOUNTY_HUNTERS + TOTAL_SURVIVORS;

@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { useToast } from "@/components/ui/use-toast";
@@ -97,11 +96,24 @@ interface AlchemyContractMetadataResponse {
   };
 }
 
-// Function to fetch NFTs using Alchemy API
-const fetchNFTsWithAlchemy = async (contractAddress: string, pageSize: number = 100): Promise<NFTMetadata[]> => {
+// Centralized data fetching functions with caching mechanism
+let cachedContractStats: ContractStats | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 60 * 1000; // 1 minute cache
+
+// Function to fetch contract metadata using Alchemy API with caching
+const fetchContractMetadataWithAlchemy = async (contractAddress: string): Promise<ContractStats> => {
+  // If we have cached data and it's still fresh, return it
+  const now = Date.now();
+  if (cachedContractStats && (now - cacheTimestamp) < CACHE_DURATION) {
+    console.log("Using cached contract stats, age:", (now - cacheTimestamp) / 1000, "seconds");
+    return cachedContractStats;
+  }
+  
   try {
-    const url = `${ALCHEMY_BASE_URL}/${ALCHEMY_API_KEY}/getNFTsForContract?contractAddress=${contractAddress}&withMetadata=true&pageSize=${pageSize}`;
-    console.log("Fetching NFTs from Alchemy API:", url);
+    console.log("Cache expired or not available, fetching new contract metadata");
+    const url = `${ALCHEMY_BASE_URL}/${ALCHEMY_API_KEY}/getContractMetadata?contractAddress=${contractAddress}`;
+    console.log("Fetching contract metadata from Alchemy API:", url);
     
     const response = await fetch(url, {
       headers: {
@@ -113,8 +125,43 @@ const fetchNFTsWithAlchemy = async (contractAddress: string, pageSize: number = 
       throw new Error(`Alchemy API error: ${response.status}`);
     }
     
-    const data: AlchemyResponse = await response.json();
-    console.log('Alchemy API response:', data);
+    const data = await response.json();
+    console.log('Alchemy Contract Metadata response:', data);
+    
+    const stats = {
+      totalMinted: parseInt(data.contractMetadata.totalSupply || '0', 10),
+      contractName: data.contractMetadata.name || "Unknown",
+      contractSymbol: data.contractMetadata.symbol || "???"
+    };
+    
+    // Cache the new data
+    cachedContractStats = stats;
+    cacheTimestamp = now;
+    
+    return stats;
+  } catch (error) {
+    console.error("Error fetching contract metadata with Alchemy:", error);
+    throw error;
+  }
+};
+
+// Function to fetch NFTs using Alchemy API
+const fetchNFTsWithAlchemy = async (contractAddress: string, pageSize: number = 100): Promise<NFTMetadata[]> => {
+  try {
+    const url = `${ALCHEMY_BASE_URL}/${ALCHEMY_API_KEY}/getNFTsForContract?contractAddress=${contractAddress}&withMetadata=true&pageSize=${pageSize}`;
+    console.log("Fetching NFTs from Alchemy API (with caching)");
+    
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Alchemy API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
     
     // Map Alchemy response to our NFTMetadata format
     return data.ownedNfts.map(nft => ({
@@ -132,37 +179,7 @@ const fetchNFTsWithAlchemy = async (contractAddress: string, pageSize: number = 
   }
 };
 
-// Function to fetch contract metadata using Alchemy API
-const fetchContractMetadataWithAlchemy = async (contractAddress: string): Promise<ContractStats> => {
-  try {
-    const url = `${ALCHEMY_BASE_URL}/${ALCHEMY_API_KEY}/getContractMetadata?contractAddress=${contractAddress}`;
-    console.log("Fetching contract metadata from Alchemy API:", url);
-    
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Alchemy API error: ${response.status}`);
-    }
-    
-    const data: AlchemyContractMetadataResponse = await response.json();
-    console.log('Alchemy Contract Metadata response:', data);
-    
-    return {
-      totalMinted: parseInt(data.contractMetadata.totalSupply || '0', 10),
-      contractName: data.contractMetadata.name || "Unknown",
-      contractSymbol: data.contractMetadata.symbol || "???"
-    };
-  } catch (error) {
-    console.error("Error fetching contract metadata with Alchemy:", error);
-    throw error;
-  }
-};
-
-// Hook to get all minted NFTs in the contract using Alchemy
+// Hook to get all minted NFTs in the contract using Alchemy - with improved caching
 export const useAllContractNFTs = (first: number = 100) => {
   const { toast } = useToast();
   
@@ -249,10 +266,13 @@ export const useAllContractNFTs = (first: number = 100) => {
       }
     },
     staleTime: 60 * 1000, // 1 minute
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 };
 
-// Hook to get contract stats
+// Hook to get contract stats - significantly optimized to reduce API calls
 export const useContractStats = () => {
   const { toast } = useToast();
   
@@ -297,11 +317,17 @@ export const useContractStats = () => {
         const totalSupply = await contract.totalSupply();
         console.log(`Total supply: ${totalSupply.toString()} NFTs minted in contract`);
         
-        return {
+        const stats = {
           totalMinted: Number(totalSupply),
           contractName,
           contractSymbol
         };
+        
+        // Cache the result
+        cachedContractStats = stats;
+        cacheTimestamp = Date.now();
+        
+        return stats;
       } catch (err) {
         console.error("Error fetching contract stats:", err);
         toast({
@@ -319,6 +345,9 @@ export const useContractStats = () => {
       }
     },
     staleTime: 60 * 1000, // 1 minute
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 };
 
@@ -418,5 +447,9 @@ export const useContractNFTs = (address?: string) => {
       return nfts;
     },
     enabled: !!address,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 };
