@@ -17,65 +17,101 @@ export const NeonSign = ({
   className, 
   flickerIntensity = 'medium' 
 }: NeonSignProps) => {
-  const [flickerState, setFlickerState] = useState<boolean[]>([]);
+  const [flickerState, setFlickerState] = useState<Array<0 | 0.5 | 1>>([]);
   const combinedText = text || (firstLine + secondLine);
   
   useEffect(() => {
-    // Create initial flicker state for each letter
-    setFlickerState(Array(combinedText.length).fill(true));
+    // Create initial flicker state for each letter (fully lit)
+    setFlickerState(Array(combinedText.length).fill(1));
     
-    // Set up the flicker interval
+    // Set up the flicker interval with slower timing
     const intensityMap = {
-      low: 1200,
-      medium: 800,
-      high: 400
+      low: 2000,     // Slower flicker for more realistic broken neon
+      medium: 1500,
+      high: 1000
     };
     
+    // Main flicker interval - occasionally dim random letters
     const flickerInterval = setInterval(() => {
       setFlickerState(prev => {
-        return prev.map(() => Math.random() > 0.2);
+        // Most letters stay on, only a few change
+        return prev.map(state => Math.random() > 0.9 ? (Math.random() > 0.5 ? 1 : 0.5) : state);
       });
     }, intensityMap[flickerIntensity]);
     
-    // Random letter flicker for sporadic effect
-    const randomFlickerInterval = setInterval(() => {
+    // Special effect interval - one letter completely out, one at half brightness
+    const specialEffectInterval = setInterval(() => {
       setFlickerState(prev => {
         const newState = [...prev];
-        const randomIndex = Math.floor(Math.random() * combinedText.length);
-        newState[randomIndex] = !newState[randomIndex];
+        // Pick a random letter to turn completely off
+        const offIndex = Math.floor(Math.random() * combinedText.length);
+        // Pick another random letter for half brightness
+        let halfIndex;
+        do {
+          halfIndex = Math.floor(Math.random() * combinedText.length);
+        } while (halfIndex === offIndex); // Ensure they're not the same letter
+        
+        // Set the states
+        newState[offIndex] = 0;     // Completely off
+        newState[halfIndex] = 0.5;  // Half brightness
+        
         return newState;
       });
-    }, 100);
+    }, 2500); // Slower interval for the special effect
     
     return () => {
       clearInterval(flickerInterval);
-      clearInterval(randomFlickerInterval);
+      clearInterval(specialEffectInterval);
     };
   }, [combinedText, flickerIntensity]);
   
+  const getStyleForState = (state: 0 | 0.5 | 1) => {
+    switch(state) {
+      case 0:   // Completely off
+        return {
+          opacity: "0.3",
+          textShadow: "none"
+        };
+      case 0.5: // Half lit
+        return {
+          opacity: "0.7", 
+          textShadow: "0 0 3px #39FF14, 0 0 5px #39FF14"
+        };
+      case 1:   // Fully lit
+      default:
+        return {
+          opacity: "1", 
+          textShadow: "0 0 5px #39FF14, 0 0 10px #39FF14, 0 0 20px #39FF14"
+        };
+    }
+  };
+  
   const renderNeonText = (line: string, offset: number = 0) => {
-    return line.split('').map((char, index) => (
-      <span 
-        key={`${char}-${index + offset}`} 
-        className={cn(
-          "inline-block relative toxic-glow transition-opacity duration-75",
-          flickerState[index + offset] 
-            ? "text-toxic-neon opacity-100" 
-            : "text-toxic-neon/50 opacity-60"
-        )}
-        style={{
-          textShadow: flickerState[index + offset] 
-            ? "0 0 5px #39FF14, 0 0 10px #39FF14, 0 0 20px #39FF14" 
-            : "0 0 2px #39FF14"
-        }}
-      >
-        {/* Sparks effect on random letters */}
-        {Math.random() > 0.96 && (
-          <span className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-toxic-neon rounded-full animation-delay-300 animate-ping"></span>
-        )}
-        {char}
-      </span>
-    ));
+    return line.split('').map((char, index) => {
+      const absoluteIndex = index + offset;
+      const state = flickerState[absoluteIndex] || 1;
+      const style = getStyleForState(state);
+      
+      return (
+        <span 
+          key={`${char}-${absoluteIndex}`} 
+          className={cn(
+            "inline-block relative toxic-glow transition-opacity duration-300",
+            "text-toxic-neon"
+          )}
+          style={{
+            ...style,
+            transition: "text-shadow 0.4s ease-out, opacity 0.3s ease-out"
+          }}
+        >
+          {/* Sparks effect only on fully lit letters occasionally */}
+          {state === 1 && Math.random() > 0.95 && (
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-toxic-neon rounded-full animation-delay-300 animate-ping"></span>
+          )}
+          {char}
+        </span>
+      );
+    });
   };
   
   return (
