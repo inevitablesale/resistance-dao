@@ -385,10 +385,14 @@ export async function updateSurvivorMetadata(
 
 /**
  * Gets details about a party
+ * @param provider Provider to use for querying
  * @param partyAddress Address of the party
  * @returns Promise resolving to party details
  */
-export async function getPartyDetails(partyAddress: string) {
+export async function getPartyDetails(
+  provider: ethers.providers.Provider,
+  partyAddress: string
+) {
   try {
     // Mock implementation for now
     return {
