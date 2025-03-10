@@ -4,6 +4,7 @@ import { Target, Shield, Zap, ArrowRight, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useNFTRoles } from "@/hooks/useNFTRoles";
+import { ToxicBadge } from "@/components/ui/toxic-badge";
 
 interface RoleBasedHubProps {
   onSelectRole: (role: string) => void;
@@ -15,11 +16,23 @@ interface RoleCard {
   icon: React.ReactNode;
   color: string;
   abilities: string[];
+  count: number;
   unlocked: boolean;
 }
 
 export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
-  const { primaryRole, isSentinel, isSurvivor, isBountyHunter } = useNFTRoles();
+  const { 
+    primaryRole, 
+    isSentinel, 
+    isSurvivor, 
+    isBountyHunter,
+    nfts
+  } = useNFTRoles();
+  
+  // Count NFTs by class
+  const sentinelCount = nfts.filter(nft => nft.class === 'Sentinel').length;
+  const survivorCount = nfts.filter(nft => nft.class === 'Survivor').length;
+  const bountyHunterCount = nfts.filter(nft => nft.class === 'Bounty Hunter').length;
   
   const roleCards: RoleCard[] = [
     {
@@ -33,6 +46,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
         "Deploy reward pools",
         "Monitor hunter performance"
       ],
+      count: sentinelCount,
       unlocked: isSentinel
     },
     {
@@ -46,6 +60,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
         "Manage contributor tasks",
         "Deploy participation pools"
       ],
+      count: survivorCount,
       unlocked: isSurvivor
     },
     {
@@ -59,6 +74,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
         "Build hunter reputation",
         "Earn role-based rewards"
       ],
+      count: bountyHunterCount,
       unlocked: isBountyHunter
     }
   ];
@@ -79,10 +95,12 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   {role.icon}
-                  {role.unlocked ? (
-                    <span className="text-xs px-2 py-1 rounded-full bg-toxic-neon/20 text-toxic-neon font-medium">Unlocked</span>
+                  {role.count > 0 ? (
+                    <ToxicBadge variant="default" className="bg-toxic-neon/20 text-toxic-neon border-toxic-neon/40">
+                      {role.count}x
+                    </ToxicBadge>
                   ) : (
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-800 text-gray-300 font-medium">Locked</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-800 text-gray-300 font-medium">None</span>
                   )}
                 </div>
                 <CardTitle className="text-white mt-3 text-2xl">{role.title}</CardTitle>
