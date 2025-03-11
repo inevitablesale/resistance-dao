@@ -658,6 +658,30 @@ export const recordSuccessfulReferral = async (
       return { success: false, error: `Bounty is ${bounty.status}, not active` };
     }
     
+    // Get current metadata from IPFS
+    const metadataURI = bounty.metadataURI;
+    
+    if (!metadataURI) {
+      return { success: false, error: "Bounty has no metadata URI" };
+    }
+    
+    // Get metadata
+    const metadata = await getFromIPFS<BountyMetadata>(
+      metadataURI.replace('ipfs://', ''),
+      'bounty'
+    );
+    
+    // Calculate reward amount with performance multiplier if enabled
+    let rewardAmount = bounty.rewardAmount;
+    let multiplier = 1.0;
+    
+    if (metadata.hunterTiers?.enabled && metadata.hunterPerformance) {
+      // Import function to calculate reward multiplier
+      const { calculateRewardMultiplier } = await import('./hunterPerformanceService');
+      multiplier = calculateRewardMultiplier(metadata, referrerId);
+      rewardAmount = rewardAmount * multiplier;
+    }
+    
     // Create party contract instance
     const party = new ethers.Contract(
       bountyId,
@@ -667,7 +691,7 @@ export const recordSuccessfulReferral = async (
     
     // Prepare proposal to transfer ETH to referrer
     const targets = [referrerId];
-    const values = [ethers.utils.parseEther(bounty.rewardAmount.toString())];
+    const values = [ethers.utils.parseEther(rewardAmount.toString())];
     const calldatas = ["0x"]; // Empty calldata for simple ETH transfer
     
     // Create proposal data structure
@@ -679,7 +703,7 @@ export const recordSuccessfulReferral = async (
       signatures: [""]
     };
     
-    const description = `Reward for referring ${referredUser}`;
+    const description = `Reward for referring ${referredUser} (Multiplier: ${multiplier.toFixed(2)})`;
     
     // Submit proposal
     console.log("Submitting referral reward proposal...");
@@ -693,6 +717,23 @@ export const recordSuccessfulReferral = async (
     
     // Wait for transaction to confirm
     await tx.wait(1);
+    
+    // Update hunter performance with this successful referral
+    const { updateHunterPerformance } = await import('./hunterPerformanceService');
+    const updatedMetadata = updateHunterPerformance(
+      metadata,
+      referrerId,
+      true, // successful
+      undefined, // We don't track completion time yet
+      rewardAmount
+    );
+    
+    // Upload updated metadata to IPFS
+    const newMetadataURI = await uploadToIPFS(updatedMetadata);
+    console.log("Updated metadata uploaded to IPFS:", newMetadataURI);
+    
+    // Update the party's metadata URI
+    await party.updateMetadataURI(newMetadataURI);
     
     return { success: true };
   } catch (error) {
@@ -921,5 +962,116 @@ export const fundBounty = async (
       success: false, 
       error: error instanceof Error ? error.message : "Unknown error funding bounty"
     };
+  }
+};
+
+export const updateBountyHunterTiers = async (
+  bountyId: string,
+  hunterTiers: BountyMetadata['hunterTiers'],
+  performanceMultipliers: BountyMetadata['performanceMultipliers'],
+  wallet: ethers.Signer
+): Promise<{ success: boolean, error?: string }> => {
+  console.log(`Updating hunter tiers for bounty ${bountyId}`);
+  
+  try {
+    if (!wallet) {
+      return { success: false, error: "Wallet not connected" };
+    }
+    
+    if (!bountyId || !ethers.utils.isAddress(bountyId)) {
+      return { success: false, error: "Valid Bounty ID required" };
+    }
+    
+    // Get party contract instance
+    const party = new ethers.Contract(
+      bountyId,
+      PARTY_GOVERNANCE_ABI,
+      wallet
+    );
+    
+    // Get current metadata URI
+    const metadataURI = await party.metadataURI();
+    
+    if (!metadataURI) {
+      return { success: false, error: "Bounty has no metadata URI" };
+    }
+    
+    // Get existing metadata
+    const metadata = await getFromIPFS<BountyMetadata>(
+      metadataURI.replace('ipfs://', ''),
+      'bounty'
+    );
+    
+    // Update the hunter tiers in metadata
+    const updatedMetadata: BountyMetadata = {
+      ...metadata,
+      hunterTiers,
+      performanceMultipliers
+    };
+    
+    // Upload updated metadata to IPFS
+    const newMetadataURI = await uploadToIPFS(updatedMetadata);
+    console.log("Updated metadata uploaded to IPFS:", newMetadataURI);
+    
+    // Update the party's metadata URI
+    const tx = await party.updateMetadataURI(newMetadataURI);
+    console.log("Updating party metadata:", tx.hash);
+    await tx.wait(1);
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating hunter tiers:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error updating hunter tiers"
+    };
+  }
+};
+
+export const getHunterPerformance = async (
+  bountyId: string,
+  hunterAddress: string
+): Promise<any> => {
+  try {
+    if (!bountyId || !ethers.utils.isAddress(bountyId)) {
+      throw new Error("Valid Bounty ID required");
+    }
+    
+    // Get bounty details
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    // Get metadata from IPFS
+    const metadataURI = bounty.metadataURI;
+    
+    if (!metadataURI) {
+      throw new Error("Bounty has no metadata URI");
+    }
+    
+    const metadata = await getFromIPFS<BountyMetadata>(
+      metadataURI.replace('ipfs://', ''),
+      'bounty'
+    );
+    
+    if (!metadata.hunterTiers?.enabled) {
+      return { 
+        enabled: false,
+        message: "Performance tiers not enabled for this bounty"
+      };
+    }
+    
+    // Import helper function
+    const { getHunterTierInfo } = await import('./hunterPerformanceService');
+    const tierInfo = getHunterTierInfo(metadata, hunterAddress);
+    
+    return {
+      enabled: true,
+      ...tierInfo
+    };
+  } catch (error) {
+    console.error("Error getting hunter performance:", error);
+    throw error;
   }
 };

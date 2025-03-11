@@ -17,6 +17,25 @@ export interface IPFSContent {
   [key: string]: any;
 }
 
+// Define bounty hunter tiers and performance levels
+export type HunterTierLevel = "bronze" | "silver" | "gold" | "platinum";
+
+export interface HunterTier {
+  level: HunterTierLevel;
+  requiredReferrals: number;
+  requiredSuccessRate: number;  // As a percentage (e.g., 80%)
+  rewardMultiplier: number;     // e.g., 1.0 for standard, 1.2 for bronze, etc.
+  description: string;
+  benefits: string[];
+}
+
+// Define reward multiplier structure for different performance metrics
+export interface PerformanceMultipliers {
+  successRate: {[threshold: number]: number};  // e.g., {80: 1.1, 90: 1.2}
+  timeToComplete: {[hoursUnder: number]: number};  // e.g., {24: 1.1, 12: 1.2}
+  totalCompleted: {[count: number]: number};  // e.g., {10: 1.05, 25: 1.1}
+}
+
 // Define Bounty metadata interface for IPFS storage
 export interface BountyMetadata extends IPFSContent {
   bountyType: "nft_referral" | "token_referral" | "social_media" | "token_distribution";
@@ -31,6 +50,26 @@ export interface BountyMetadata extends IPFSContent {
   expiresAt: number;
   crowdfundAddress?: string;
   status?: "active" | "paused" | "expired" | "completed";
+  
+  // Performance reward settings
+  hunterTiers?: {
+    enabled: boolean;
+    tiers: HunterTier[];
+    defaultTier: HunterTierLevel;
+  };
+  
+  performanceMultipliers?: PerformanceMultipliers;
+  
+  // Leaderboard configuration
+  leaderboard?: {
+    enabled: boolean;
+    displayTopCount: number;
+    resetPeriod?: "never" | "weekly" | "monthly" | "quarterly";
+    rewards?: {
+      top3Multiplier: number;
+      top10Multiplier: number;
+    }
+  };
   
   // New fields for token distribution
   tokenRewards?: {
@@ -68,6 +107,22 @@ export interface BountyMetadata extends IPFSContent {
     topReferrers?: string[];
     referralsByRegion?: {[region: string]: number};
     [key: string]: any;
+  };
+  
+  // Hunter performance tracking
+  hunterPerformance?: {
+    [address: string]: {
+      totalReferrals: number;
+      successfulReferrals: number;
+      failedReferrals: number;
+      successRate: number;
+      totalEarned: number;
+      averageCompletionTime: number;
+      currentTier: HunterTierLevel;
+      tierProgress: number;  // Progress to next tier (0-100%)
+      rewardMultiplier: number;
+      lastUpdated: number;
+    }
   };
 }
 
