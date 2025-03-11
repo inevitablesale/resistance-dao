@@ -3,7 +3,7 @@ import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
 import { toast } from "@/hooks/use-toast";
 import { uploadToIPFS, getFromIPFS } from "./ipfsService";
-import { BountyMetadata } from "@/types/content";
+import { BountyMetadata, TokenDistributionConfig } from "@/types/content";
 import { 
   PARTY_PROTOCOL, 
   PARTY_FACTORY_ABI, 
@@ -27,10 +27,30 @@ export interface Bounty {
   requireVerification: boolean;
   allowPublicHunters: boolean;
   maxReferralsPerHunter: number;
-  bountyType: "nft_referral" | "token_referral" | "social_media";
+  bountyType: "nft_referral" | "token_referral" | "social_media" | "token_distribution";
   remainingBudget?: number;
   crowdfundAddress: string | null;
   metadataURI: string | null;
+  tokenRewards?: {
+    tokenAddress: string;
+    tokenType: "erc20" | "erc721" | "erc1155";
+    tokenIds?: string[];
+    amountPerReferral?: number;
+    totalTokens?: number;
+    remainingTokens?: number;
+    distributionStrategy?: "first-come" | "proportional" | "milestone" | "lottery";
+  };
+  projectInfo?: {
+    name: string;
+    website?: string;
+    logoUrl?: string;
+    socialLinks?: {
+      twitter?: string;
+      discord?: string;
+      telegram?: string;
+      [key: string]: string | undefined;
+    };
+  };
 }
 
 export interface BountyCreationParams {
@@ -45,7 +65,26 @@ export interface BountyCreationParams {
   requireVerification: boolean;
   eligibleNFTs: string[];
   successCriteria: string;
-  bountyType: "nft_referral" | "token_referral" | "social_media";
+  bountyType: "nft_referral" | "token_referral" | "social_media" | "token_distribution";
+  tokenRewards?: {
+    tokenAddress: string;
+    tokenType: "erc20" | "erc721" | "erc1155";
+    tokenIds?: string[];
+    amountPerReferral?: number;
+    totalTokens?: number;
+    distributionStrategy?: "first-come" | "proportional" | "milestone" | "lottery";
+  };
+  projectInfo?: {
+    name: string;
+    website?: string;
+    logoUrl?: string;
+    socialLinks?: {
+      twitter?: string;
+      discord?: string;
+      telegram?: string;
+      [key: string]: string | undefined;
+    };
+  };
 }
 
 export interface BountyOptions {
@@ -163,6 +202,16 @@ const mapPartyToBounty = async (
       crowdfundAddress,
       metadataURI: metadata.metadataURI
     };
+    
+    // Include token rewards information if available
+    if (metadata.tokenRewards) {
+      bounty.tokenRewards = metadata.tokenRewards;
+    }
+    
+    // Include project info if available
+    if (metadata.projectInfo) {
+      bounty.projectInfo = metadata.projectInfo;
+    }
     
     return calculateRemainingBudget(bounty);
   } catch (error) {
@@ -335,6 +384,16 @@ export const createBounty = async (
       metadataURI
     };
     
+    // Add token rewards if provided
+    if (params.tokenRewards) {
+      newBounty.tokenRewards = params.tokenRewards;
+    }
+    
+    // Add project info if provided
+    if (params.projectInfo) {
+      newBounty.projectInfo = params.projectInfo;
+    }
+    
     return newBounty;
   } catch (error) {
     console.error("Error creating bounty:", error);
@@ -383,6 +442,16 @@ export const deployBountyToBlockchain = async (
       createdAt: now,
       expiresAt: now + (60 * 60 * 24 * bountyParams.duration)
     };
+    
+    // Add token rewards information if available
+    if (bountyParams.tokenRewards) {
+      bountyMetadata.tokenRewards = bountyParams.tokenRewards;
+    }
+    
+    // Add project info if available
+    if (bountyParams.projectInfo) {
+      bountyMetadata.projectInfo = bountyParams.projectInfo;
+    }
     
     const metadataURI = await uploadToIPFS(bountyMetadata);
     console.log("Bounty metadata uploaded to IPFS:", metadataURI);
