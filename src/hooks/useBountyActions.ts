@@ -7,7 +7,8 @@ import {
   updateBountyStatus,
   fundBounty,
   distributeRewards,
-  recordSuccessfulReferral
+  recordSuccessfulReferral,
+  BountyCreationParams
 } from '@/services/bountyService';
 
 export const useBountyActions = () => {
@@ -15,7 +16,7 @@ export const useBountyActions = () => {
   const { toast } = useToast();
   const { address, isConnected, primaryWallet } = useWalletConnection();
 
-  const deployBounty = async (bountyId: string) => {
+  const deployBounty = async (bountyParams: BountyCreationParams) => {
     if (!isConnected || !primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -27,7 +28,7 @@ export const useBountyActions = () => {
 
     setIsProcessing(true);
     try {
-      const result = await deployBountyToBlockchain(bountyId, primaryWallet);
+      const result = await deployBountyToBlockchain(bountyParams, primaryWallet);
       
       toast({
         title: "Bounty Deployed",
@@ -162,14 +163,16 @@ export const useBountyActions = () => {
   const recordReferral = async (
     bountyId: string,
     referrerId: string,
-    referredUser: string
+    referredUser: string,
+    wallet: any
   ) => {
     setIsProcessing(true);
     try {
       const result = await recordSuccessfulReferral(
         bountyId,
         referrerId,
-        referredUser
+        referredUser,
+        wallet
       );
       
       if (result.success) {

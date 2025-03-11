@@ -15,7 +15,7 @@ const PINATA_CREDENTIALS = {
 
 export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
   hash: string,
-  type: 'proposal' | 'content'
+  type: 'proposal' | 'content' | 'bounty'
 ): Promise<T> => {
   try {
     console.log('\n=== Starting IPFS Retrieval ===');
@@ -56,7 +56,7 @@ export const uploadToIPFS = async <T extends object>(
       headers: {
         'Content-Type': 'application/json',
         'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
-        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_API_SECRET
+        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_SECRET_API_KEY
       },
       body: JSON.stringify(content)
     });
@@ -131,7 +131,7 @@ export const uploadModelToIPFS = async (
       method: 'POST',
       headers: {
         'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
-        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_API_SECRET
+        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_SECRET_API_KEY
       },
       body: formData
     });

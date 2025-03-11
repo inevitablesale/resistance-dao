@@ -1,9 +1,9 @@
-
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
 import { toast } from "@/hooks/use-toast";
 import { uploadToIPFS, getFromIPFS } from "./ipfsService";
+import { BountyMetadata } from "@/types/content";
 import { 
   PARTY_PROTOCOL, 
   PARTY_FACTORY_ABI, 
@@ -66,7 +66,7 @@ const calculateRemainingBudget = (bounty: Bounty): Bounty => {
  */
 const mapPartyToBounty = async (
   partyAddress: string, 
-  metadata: any, 
+  metadata: BountyMetadata, 
   provider: ethers.providers.Provider
 ): Promise<Bounty | null> => {
   try {
@@ -145,8 +145,8 @@ const mapPartyToBounty = async (
     // Create bounty object
     const bounty: Bounty = {
       id: partyAddress,
-      name: metadata.name,
-      description: metadata.description,
+      name: metadata.title,
+      description: metadata.content,
       rewardAmount: metadata.rewardAmount,
       totalBudget,
       usedBudget,
@@ -221,7 +221,7 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
         if (!metadataURI) return null;
         
         // Fetch and parse metadata
-        const metadata = await getFromIPFS(
+        const metadata = await getFromIPFS<BountyMetadata>(
           metadataURI.replace('ipfs://', ''),
           'bounty'
         );
@@ -282,7 +282,7 @@ export const getBounty = async (bountyId: string): Promise<Bounty | null> => {
     }
     
     // Fetch and parse metadata
-    const metadata = await getFromIPFS(
+    const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
@@ -308,19 +308,7 @@ export const createBounty = async (
   try {
     // Deploy the bounty to blockchain using Party Protocol
     const { partyAddress, crowdfundAddress, metadataURI } = await deployBountyToBlockchain(
-      {
-        name: params.name,
-        description: params.description,
-        rewardAmount: params.rewardAmount,
-        totalBudget: params.totalBudget,
-        duration: params.duration,
-        requireVerification: params.requireVerification,
-        allowPublicHunters: params.allowPublicHunters,
-        maxReferralsPerHunter: params.maxReferralsPerHunter,
-        eligibleNFTs: params.eligibleNFTs,
-        bountyType: params.bountyType,
-        successCriteria: params.successCriteria
-      },
+      params,
       wallet
     );
     
@@ -355,19 +343,7 @@ export const createBounty = async (
 };
 
 export const deployBountyToBlockchain = async (
-  bountyParams: {
-    name: string;
-    description: string;
-    rewardAmount: number;
-    totalBudget: number;
-    duration: number;
-    requireVerification: boolean;
-    allowPublicHunters: boolean;
-    maxReferralsPerHunter: number;
-    eligibleNFTs: string[];
-    bountyType: "nft_referral" | "token_referral" | "social_media";
-    successCriteria: string;
-  },
+  bountyParams: BountyCreationParams,
   wallet: ethers.Signer
 ): Promise<{ partyAddress: string; crowdfundAddress: string; metadataURI: string }> => {
   console.log(`Deploying bounty to blockchain`);
@@ -386,9 +362,16 @@ export const deployBountyToBlockchain = async (
     
     // Upload bounty metadata to IPFS
     const now = Math.floor(Date.now() / 1000);
-    const bountyMetadata = {
-      name: bountyParams.name,
-      description: bountyParams.description,
+    const bountyMetadata: BountyMetadata = {
+      contentSchema: "resistanceBounty-v1",
+      contentType: "bounty",
+      title: bountyParams.name,
+      content: bountyParams.description,
+      metadata: {
+        author: userAddress,
+        publishedAt: now,
+        version: 1
+      },
       bountyType: bountyParams.bountyType,
       rewardAmount: bountyParams.rewardAmount,
       totalBudget: bountyParams.totalBudget,
@@ -546,7 +529,7 @@ export const deployBountyToBlockchain = async (
     await contributeTx.wait();
     
     // Update the party metadata to include the crowdfund address
-    const updatedMetadata = {
+    const updatedMetadata: BountyMetadata = {
       ...bountyMetadata,
       crowdfundAddress
     };
@@ -771,13 +754,13 @@ export const updateBountyStatus = async (
     }
     
     // Get existing metadata
-    const metadata = await getFromIPFS(
+    const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
     
     // Update the status in metadata
-    const updatedMetadata = {
+    const updatedMetadata: BountyMetadata = {
       ...metadata,
       status: newStatus
     };
@@ -843,7 +826,7 @@ export const fundBounty = async (
     const metadataURI = await party.metadataURI();
     
     // Get existing metadata
-    const metadata = await getFromIPFS(
+    const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
@@ -851,7 +834,7 @@ export const fundBounty = async (
     // Update the total budget in metadata
     const updatedMetadata = {
       ...metadata,
-      totalBudget: (Number(metadata.totalBudget) || 0) + additionalFunds
+      totalBudget: (metadata.totalBudget || 0) + additionalFunds
     };
     
     // Upload updated metadata to IPFS

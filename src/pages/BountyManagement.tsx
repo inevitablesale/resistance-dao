@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Award, DollarSign, BarChart3, Clock, Target, UserPlus, Shield } from "lucide-react";
@@ -6,18 +5,19 @@ import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { getBounties, Bounty, deployBountyToBlockchain } from "@/services/bountyService";
+import { getBounties, Bounty, BountyCreationParams } from "@/services/bountyService";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
+import { useBountyActions } from "@/hooks/useBountyActions";
 
 export default function BountyManagement() {
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [activeBounties, setActiveBounties] = useState<Bounty[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeploying, setIsDeploying] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { address, primaryWallet, isConnected } = useWalletConnection();
+  const { deployBounty, isProcessing } = useBountyActions();
 
   useEffect(() => {
     const loadBounties = async () => {
@@ -48,7 +48,7 @@ export default function BountyManagement() {
     navigate(`/bounty/${id}`);
   };
 
-  const handleDeployBounty = async (id: string) => {
+  const handleDeployBounty = async (bounty: Bounty) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -57,21 +57,30 @@ export default function BountyManagement() {
       });
       return;
     }
+    
+    const bountyParams: BountyCreationParams = {
+      name: bounty.name,
+      description: bounty.description,
+      rewardType: "fixed",
+      rewardAmount: bounty.rewardAmount,
+      totalBudget: bounty.totalBudget,
+      duration: Math.floor((bounty.expiresAt - Math.floor(Date.now() / 1000)) / (60 * 60 * 24)),
+      maxReferralsPerHunter: bounty.maxReferralsPerHunter,
+      allowPublicHunters: bounty.allowPublicHunters,
+      requireVerification: bounty.requireVerification,
+      eligibleNFTs: bounty.eligibleNFTs,
+      successCriteria: "Successful referral completion",
+      bountyType: bounty.bountyType
+    };
 
-    setIsDeploying(id);
     try {
-      const deployResult = await deployBountyToBlockchain(id, primaryWallet);
+      const deployResult = await deployBounty(bountyParams);
       
-      toast({
-        title: "Bounty Deployed!",
-        description: `Successfully deployed bounty to address: ${deployResult.partyAddress.substring(0, 6)}...${deployResult.partyAddress.substring(38)}`
-      });
-      
-      // Refresh bounties list
-      const updatedBounties = await getBounties();
-      setBounties(updatedBounties);
-      setActiveBounties(updatedBounties.filter(b => b.status === "active"));
-      
+      if (deployResult) {
+        const updatedBounties = await getBounties();
+        setBounties(updatedBounties);
+        setActiveBounties(updatedBounties.filter(b => b.status === "active"));
+      }
     } catch (error) {
       console.error("Error deploying bounty:", error);
       toast({
@@ -79,8 +88,6 @@ export default function BountyManagement() {
         description: error instanceof Error ? error.message : "Failed to deploy bounty to blockchain",
         variant: "destructive"
       });
-    } finally {
-      setIsDeploying(null);
     }
   };
 
@@ -238,10 +245,10 @@ export default function BountyManagement() {
                             <ToxicButton
                               variant="primary"
                               className="flex-1 h-10"
-                              onClick={() => handleDeployBounty(bounty.id)}
-                              disabled={!!isDeploying}
+                              onClick={() => handleDeployBounty(bounty)}
+                              disabled={isProcessing}
                             >
-                              {isDeploying === bounty.id ? (
+                              {isProcessing ? (
                                 <>
                                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
                                   Deploying...
