@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
@@ -10,17 +11,16 @@ import {
   updateBountyStatus,
   fundBounty,
   BountyCreationParams,
-  Bounty,
-  BountyOptions
+  Bounty
 } from '@/services/bountyService';
 
 export const useBountyActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { wallet } = useCustomWallet();
+  const { address, primaryWallet } = useCustomWallet();
 
   const handleCreateBounty = async (params: BountyCreationParams) => {
-    if (!wallet) {
+    if (!primaryWallet) {
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet to create a bounty.",
@@ -31,7 +31,7 @@ export const useBountyActions = () => {
 
     setIsLoading(true);
     try {
-      const newBounty = await createBounty(params, wallet);
+      const newBounty = await createBounty(params, primaryWallet);
       
       toast({
         title: "Bounty Created",
@@ -103,7 +103,7 @@ export const useBountyActions = () => {
   };
 
   const handleDistributeRewards = async (bountyId: string) => {
-    if (!wallet) {
+    if (!primaryWallet) {
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet to distribute rewards",
@@ -114,7 +114,7 @@ export const useBountyActions = () => {
 
     setIsLoading(true);
     try {
-      const result = await distributeRewards(bountyId, wallet);
+      const result = await distributeRewards(bountyId, primaryWallet);
       
       if (result.success) {
         toast({
@@ -147,7 +147,7 @@ export const useBountyActions = () => {
     bountyId: string,
     newStatus: "active" | "paused" | "expired" | "completed"
   ) => {
-    if (!wallet) {
+    if (!primaryWallet) {
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet to update bounty status",
@@ -158,7 +158,7 @@ export const useBountyActions = () => {
 
     setIsLoading(true);
     try {
-      const result = await updateBountyStatus(bountyId, newStatus, wallet);
+      const result = await updateBountyStatus(bountyId, newStatus, primaryWallet);
       
       if (result.success) {
         toast({
@@ -188,7 +188,7 @@ export const useBountyActions = () => {
   };
 
   const handleFundBounty = async (bountyId: string, additionalFunds: number) => {
-    if (!wallet) {
+    if (!primaryWallet) {
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet to fund a bounty",
@@ -199,7 +199,7 @@ export const useBountyActions = () => {
 
     setIsLoading(true);
     try {
-      const result = await fundBounty(bountyId, additionalFunds, wallet);
+      const result = await fundBounty(bountyId, additionalFunds, primaryWallet);
       
       if (result.success) {
         toast({

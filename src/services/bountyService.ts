@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
@@ -33,13 +34,13 @@ const BOUNTIES_DATA = [
     successCount: 20,
     hunterCount: 5,
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15, // 15 days from now
-    status: "active",
+    status: "active" as const,
     partyAddress: null,
     eligibleNFTs: [],
     requireVerification: false,
     allowPublicHunters: true,
     maxReferralsPerHunter: 5,
-    bountyType: "token_referral"
+    bountyType: "token_referral" as const
   },
   {
     id: "b3",
@@ -51,13 +52,13 @@ const BOUNTIES_DATA = [
     successCount: 23,
     hunterCount: 12,
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 60, // 60 days from now
-    status: "active",
+    status: "active" as const,
     partyAddress: null,
     eligibleNFTs: [],
     requireVerification: true,
     allowPublicHunters: false,
     maxReferralsPerHunter: 20,
-    bountyType: "social_media"
+    bountyType: "social_media" as const
   }
 ];
 
@@ -125,7 +126,7 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
       const bounties: Bounty[] = filteredBounties.map(b => ({
         ...b,
         remainingBudget: b.totalBudget - b.usedBudget
-      }));
+      })) as Bounty[];
       
       resolve(bounties);
     }, 800);
