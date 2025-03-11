@@ -3,8 +3,9 @@ import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
 import { transactionQueue } from "./transactionQueueService";
-import { checkTokenAllowance } from "./tokenService";
+import { checkTokenAllowance, verifyTokenTransfer, generateHoldingAddress } from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
+import { TokenTransferStatus } from "@/lib/utils";
 
 export type TransactionType = 
   | 'erc20_approval'
@@ -13,7 +14,9 @@ export type TransactionType =
   | 'erc721_transfer'
   | 'erc1155_transfer'
   | 'proposal'
-  | 'contract';
+  | 'contract'
+  | 'pool_creation'
+  | 'token_verification';
 
 export interface TransactionConfig {
   timeout: number;
@@ -37,6 +40,14 @@ export interface TransactionConfig {
     symbol?: string;
     name?: string;
   };
+  poolConfig?: {
+    poolId: string;
+    holdingAddress: string;
+    tokenType: "erc20" | "erc721" | "erc1155";
+    tokenAddress: string;
+    tokenIds?: string[];
+    amount?: string;
+  };
   walletType?: WalletType;
 }
 
@@ -54,7 +65,8 @@ export const executeTransaction = async (
   console.log(`Executing ${config.type} transaction:`, {
     description: config.description,
     tokenConfig: config.tokenConfig,
-    nftConfig: config.nftConfig
+    nftConfig: config.nftConfig,
+    poolConfig: config.poolConfig
   });
 
   // Add specific validation for NFT transactions
@@ -102,6 +114,22 @@ export const executeTransaction = async (
     console.log('Token allowance check passed');
   }
 
+  // Special handling for pool creation with holding address
+  if (config.type === 'pool_creation' && config.poolConfig && provider) {
+    console.log('Creating pool with holding address:', config.poolConfig.holdingAddress);
+    
+    // For pool creation, we can generate a holding address if not provided
+    if (!config.poolConfig.holdingAddress) {
+      const signerAddress = await provider.getSigner().getAddress();
+      config.poolConfig.holdingAddress = await generateHoldingAddress(
+        provider,
+        signerAddress,
+        config.poolConfig.poolId
+      );
+      console.log('Generated holding address:', config.poolConfig.holdingAddress);
+    }
+  }
+
   const txId = await transactionQueue.addTransaction({
     type: config.type,
     description: config.description
@@ -142,4 +170,37 @@ export const executeTransaction = async (
   });
 
   return result;
+};
+
+/**
+ * Verifies if tokens have been transferred to a holding address
+ * @param provider Ethereum provider
+ * @param poolConfig Pool configuration with token details
+ * @returns Promise resolving to verification status
+ */
+export const verifyPoolTokenTransfer = async (
+  provider: ethers.providers.Provider,
+  poolConfig: TransactionConfig['poolConfig']
+): Promise<{
+  status: TokenTransferStatus;
+  currentAmount: string;
+  targetAmount: string;
+  missingTokens?: string[];
+}> => {
+  if (!poolConfig) {
+    throw new Error("Pool configuration is required for verification");
+  }
+  
+  console.log("Verifying pool token transfer:", poolConfig);
+  
+  return await verifyTokenTransfer(
+    provider,
+    {
+      tokenAddress: poolConfig.tokenAddress,
+      tokenType: poolConfig.tokenType,
+      tokenIds: poolConfig.tokenIds,
+      amount: poolConfig.amount ? parseFloat(poolConfig.amount) : undefined
+    },
+    poolConfig.holdingAddress
+  );
 };

@@ -1,3 +1,4 @@
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ethers } from "ethers";
@@ -59,3 +60,38 @@ export function shortenAddress(address: string, chars = 4): string {
   
   return `${address.substring(0, chars + 2)}...${address.substring(42 - chars)}`;
 }
+
+/**
+ * Generates a verification status message based on token transfer status
+ * @param status The current status of token transfer
+ * @returns A user-friendly status message
+ */
+export function getTokenTransferStatusMessage(status: TokenTransferStatus): string {
+  switch(status) {
+    case 'awaiting_tokens':
+      return 'Waiting for token transfer...';
+    case 'verifying':
+      return 'Verifying token transfer...';
+    case 'completed':
+      return 'Token transfer verified!';
+    case 'failed':
+      return 'Token transfer failed. Please try again.';
+    default:
+      return 'Ready to receive tokens';
+  }
+}
+
+/**
+ * Calculates the percentage of tokens transferred compared to expected
+ * @param currentAmount Current amount of tokens transferred
+ * @param targetAmount Target amount of tokens to transfer
+ * @returns Percentage as a number between 0-100
+ */
+export function getTokenTransferProgress(currentAmount: number, targetAmount: number): number {
+  if (targetAmount <= 0) return 0;
+  const percentage = (currentAmount / targetAmount) * 100;
+  return Math.min(Math.max(percentage, 0), 100);
+}
+
+// Token transfer status types
+export type TokenTransferStatus = 'not_started' | 'awaiting_tokens' | 'verifying' | 'completed' | 'failed';

@@ -21,7 +21,7 @@ export interface Bounty {
   successCount: number;
   hunterCount: number;
   expiresAt: number;
-  status: "active" | "paused" | "expired" | "completed";
+  status: "active" | "paused" | "expired" | "completed" | "awaiting_tokens";
   partyAddress: string | null;
   eligibleNFTs: string[];
   requireVerification: boolean;
@@ -31,6 +31,8 @@ export interface Bounty {
   remainingBudget?: number;
   crowdfundAddress: string | null;
   metadataURI: string | null;
+  holdingAddress?: string;
+  tokenTransferStatus?: TokenTransferStatus;
   tokenRewards?: {
     tokenAddress: string;
     tokenType: "erc20" | "erc721" | "erc1155";
@@ -169,7 +171,7 @@ const mapPartyToBounty = async (
     
     // Determine status
     const now = Math.floor(Date.now() / 1000);
-    let bountyStatus: "active" | "paused" | "expired" | "completed" = "active";
+    let bountyStatus: "active" | "paused" | "expired" | "completed" | "awaiting_tokens" = "active";
     
     const totalBudget = parseFloat(ethers.utils.formatEther(treasuryBalance));
     
@@ -355,10 +357,27 @@ export const createBounty = async (
   }
   
   try {
+    // For token distribution bounties, we'll use the holding address pattern
+    let holdingAddress = null;
+    if (params.bountyType === "token_distribution" && params.tokenRewards) {
+      const provider = wallet.provider;
+      const creatorAddress = await wallet.getAddress();
+      
+      // Generate a unique holding address for this bounty
+      holdingAddress = await generateHoldingAddress(
+        provider,
+        creatorAddress,
+        `bounty-${Date.now()}`
+      );
+      
+      console.log("Generated holding address for token distribution:", holdingAddress);
+    }
+    
     // Deploy the bounty to blockchain using Party Protocol
     const { partyAddress, crowdfundAddress, metadataURI } = await deployBountyToBlockchain(
       params,
-      wallet
+      wallet,
+      holdingAddress
     );
     
     // Create the bounty object
@@ -372,7 +391,7 @@ export const createBounty = async (
       successCount: 0,
       hunterCount: 0,
       expiresAt: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * params.duration),
-      status: "active",
+      status: holdingAddress ? "awaiting_tokens" : "active",
       partyAddress,
       eligibleNFTs: params.eligibleNFTs,
       requireVerification: params.requireVerification,
@@ -381,7 +400,8 @@ export const createBounty = async (
       bountyType: params.bountyType,
       remainingBudget: params.totalBudget,
       crowdfundAddress,
-      metadataURI
+      metadataURI,
+      holdingAddress
     };
     
     // Add token rewards if provided
@@ -403,7 +423,8 @@ export const createBounty = async (
 
 export const deployBountyToBlockchain = async (
   bountyParams: BountyCreationParams,
-  wallet: ethers.Signer
+  wallet: ethers.Signer,
+  holdingAddress?: string
 ): Promise<{ partyAddress: string; crowdfundAddress: string; metadataURI: string }> => {
   console.log(`Deploying bounty to blockchain`);
   
@@ -445,7 +466,16 @@ export const deployBountyToBlockchain = async (
     
     // Add token rewards information if available
     if (bountyParams.tokenRewards) {
-      bountyMetadata.tokenRewards = bountyParams.tokenRewards;
+      bountyMetadata.tokenRewards = {
+        ...bountyParams.tokenRewards,
+        remainingTokens: bountyParams.tokenRewards.totalTokens
+      };
+    }
+    
+    // Add holding address for token distribution bounties
+    if (holdingAddress && bountyParams.bountyType === "token_distribution") {
+      bountyMetadata.holdingAddress = holdingAddress;
+      bountyMetadata.tokenTransferStatus = "awaiting_tokens";
     }
     
     // Add project info if available
@@ -835,7 +865,7 @@ export const distributeRewards = async (
 
 export const updateBountyStatus = async (
   bountyId: string,
-  newStatus: "active" | "paused" | "expired" | "completed",
+  newStatus: "active" | "paused" | "expired" | "completed" | "awaiting_tokens",
   wallet: ethers.Signer
 ): Promise<{ success: boolean, error?: string }> => {
   console.log(`Updating bounty ${bountyId} status to ${newStatus}`);
@@ -1074,4 +1104,101 @@ export const getHunterPerformance = async (
     console.error("Error getting hunter performance:", error);
     throw error;
   }
+};
+
+export const verifyBountyTokenTransfer = async (
+  bountyId: string,
+  provider: ethers.providers.Provider
+): Promise<{
+  status: TokenTransferStatus;
+  currentAmount: string;
+  targetAmount: string;
+  missingTokens?: string[];
+}> => {
+  try {
+    console.log(`Verifying token transfer for bounty ${bountyId}`);
+    
+    // Get bounty details
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    // Check if this is a token distribution bounty with a holding address
+    if (
+      bounty.bountyType !== "token_distribution" || 
+      !bounty.holdingAddress || 
+      !bounty.tokenRewards
+    ) {
+      throw new Error("This bounty doesn't use the token holding pattern");
+    }
+    
+    // Get the verification result
+    const result = await verifyPoolTokenTransfer(
+      provider,
+      {
+        poolId: bountyId,
+        holdingAddress: bounty.holdingAddress,
+        tokenType: bounty.tokenRewards.tokenType,
+        tokenAddress: bounty.tokenRewards.tokenAddress,
+        tokenIds: bounty.tokenRewards.tokenIds,
+        amount: bounty.tokenRewards.amountPerReferral?.toString()
+      }
+    );
+    
+    // Update the bounty metadata with the verification status
+    if (bounty.metadataURI) {
+      const metadata = await getFromIPFS<BountyMetadata>(
+        bounty.metadataURI.replace('ipfs://', ''),
+        'bounty'
+      );
+      
+      const updatedMetadata: BountyMetadata = {
+        ...metadata,
+        tokenTransferStatus: result.status
+      };
+      
+      // If the tokens have been transferred, update the bounty status
+      if (result.status === "completed") {
+        updatedMetadata.status = "active";
+      }
+      
+      // Upload updated metadata
+      const newMetadataURI = await uploadToIPFS(updatedMetadata);
+      
+      // Update the party contract metadata
+      const party = new ethers.Contract(
+        bountyId,
+        ["function updateMetadataURI(string) external"],
+        provider.getSigner()
+      );
+      
+      const tx = await party.updateMetadataURI(newMetadataURI);
+      await tx.wait();
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error verifying bounty token transfer:", error);
+    return {
+      status: "failed",
+      currentAmount: "0",
+      targetAmount: "0",
+      missingTokens: []
+    };
+  }
+};
+
+export const generateHoldingAddress = async (
+  provider: ethers.providers.Provider,
+  creatorAddress: string,
+  prefix: string
+): Promise<string> => {
+  const hash = ethers.utils.keccak256(
+    ethers.utils.defaultAbiCoder.encode(
+      ["string", "address"],
+      [prefix, creatorAddress]
+    )
+  );
+  return ethers.utils.getAddress(hash);
 };
