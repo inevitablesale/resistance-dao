@@ -1,7 +1,6 @@
-
 import { Buffer } from 'buffer';
 import { ProposalMetadata } from '@/types/proposals';
-import { IPFSContent } from '@/types/content';
+import { IPFSContent, BountyMetadata } from '@/types/content';
 
 // IPFS settings
 const IPFS_API_URL = 'https://api.pinata.cloud';
@@ -13,7 +12,7 @@ const PINATA_CREDENTIALS = {
   PINATA_API_SECRET: '87d9bb7ce78d82cc263059c8feb6df0d01fb53e2b9cfab1d364acf873331f53e'
 };
 
-export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
+export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent | BountyMetadata>(
   hash: string,
   type: 'proposal' | 'content' | 'bounty'
 ): Promise<T> => {
@@ -51,31 +50,46 @@ export const uploadToIPFS = async <T extends object>(
     console.log('\n=== Starting IPFS Upload ===');
     console.log('Content to upload:', JSON.stringify(content, null, 2));
     
-    const response = await fetch(`${IPFS_API_URL}/pinning/pinJSONToIPFS`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
-        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_SECRET_API_KEY
-      },
-      body: JSON.stringify(content)
-    });
+    const maxRetries = 3;
+    let retries = 0;
+    let lastError;
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Pinata upload failed:', errorText);
-      throw new Error('Failed to upload to Pinata');
+    while (retries < maxRetries) {
+      try {
+        const response = await fetch(`${IPFS_API_URL}/pinning/pinJSONToIPFS`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
+            'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_SECRET_API_KEY
+          },
+          body: JSON.stringify(content)
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to upload to Pinata: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        const ipfsHash = result.IpfsHash;
+        console.log('Upload successful! IPFS hash:', ipfsHash);
+        console.log('=== IPFS Upload Complete ===\n');
+        
+        return `ipfs://${ipfsHash}`;
+      } catch (err) {
+        lastError = err;
+        retries++;
+        console.warn(`Upload attempt ${retries} failed, ${maxRetries - retries} attempts remaining`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retries)));
+      }
     }
     
-    const result = await response.json();
-    const ipfsHash = result.IpfsHash;
-    console.log('Upload successful! IPFS hash:', ipfsHash);
-    console.log('=== IPFS Upload Complete ===\n');
-    
-    return `ipfs://${ipfsHash}`;
+    console.error('All upload attempts failed:', lastError);
+    throw lastError;
   } catch (error) {
     console.error('Error uploading to IPFS:', error);
-    throw error; // Propagate the error instead of returning mock data
+    throw error;
   }
 };
 

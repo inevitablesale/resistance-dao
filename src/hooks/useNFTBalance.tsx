@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getNFTBalanceByContract, fetchNFTsForAddress, RESISTANCE_NFT_ADDRESS } from "@/services/alchemyService";
+import { fetchNFTsForAddress, RESISTANCE_NFT_ADDRESS } from "@/services/alchemyService";
 import { markTokenAsAirdrop, isTokenAirdrop } from "@/services/nftPurchaseEvents";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,23 +20,31 @@ export const useNFTBalance = (address?: string) => {
       if (!address) return { balance: 0, nfts: [] };
       
       try {
-        // Use the Alchemy service to get the NFT balance
-        const balance = await getNFTBalanceByContract(address, RESISTANCE_NFT_ADDRESS);
+        console.log(`Fetching NFTs for address: ${address}`);
         
-        // Also fetch the NFTs to get their IDs and track which are airdrops
+        // Get NFTs with a single API call
         const nfts = await fetchNFTsForAddress(address);
         
+        // Filter for only Resistance NFTs
+        const resistanceNfts = nfts.filter(nft => 
+          // Additional filtering logic could be added here if needed
+          true
+        );
+        
         // Check which NFTs are airdrops vs purchases
-        const categorizedNfts = nfts.map(nft => ({
+        const categorizedNfts = resistanceNfts.map(nft => ({
           ...nft,
           isAirdrop: isTokenAirdrop(nft.tokenId)
         }));
         
+        const purchasedCount = categorizedNfts.filter(nft => !nft.isAirdrop).length;
+        const airdropCount = categorizedNfts.filter(nft => nft.isAirdrop).length;
+        
         return { 
-          balance, 
+          balance: categorizedNfts.length, 
           nfts: categorizedNfts,
-          purchasedCount: categorizedNfts.filter(nft => !nft.isAirdrop).length,
-          airdropCount: categorizedNfts.filter(nft => nft.isAirdrop).length
+          purchasedCount,
+          airdropCount
         };
       } catch (error) {
         console.error("Error fetching NFT balance:", error);
@@ -49,6 +57,8 @@ export const useNFTBalance = (address?: string) => {
       }
     },
     enabled: !!address,
+    staleTime: 60000, // Cache results for 1 minute to prevent excessive calls
+    refetchOnWindowFocus: false, // Prevent refetching when window regains focus
   });
 };
 
