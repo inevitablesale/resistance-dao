@@ -1,3 +1,4 @@
+
 import { Buffer } from 'buffer';
 import { ProposalMetadata } from '@/types/proposals';
 import { IPFSContent, BountyMetadata } from '@/types/content';
@@ -61,7 +62,7 @@ export const uploadToIPFS = async <T extends object>(
           headers: {
             'Content-Type': 'application/json',
             'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
-            'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_SECRET_API_KEY
+            'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_API_SECRET
           },
           body: JSON.stringify(content)
         });
@@ -145,7 +146,7 @@ export const uploadModelToIPFS = async (
       method: 'POST',
       headers: {
         'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
-        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_SECRET_API_KEY
+        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_API_SECRET
       },
       body: formData
     });
