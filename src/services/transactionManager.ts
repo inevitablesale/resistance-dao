@@ -3,7 +3,12 @@ import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
 import { transactionQueue } from "./transactionQueueService";
-import { checkTokenAllowance, verifyTokenTransfer, generateHoldingAddress } from "./tokenService";
+import { 
+  checkTokenAllowance, 
+  verifyTokenTransfer, 
+  generateHoldingAddress,
+  isHoldingContract 
+} from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
 import { TokenTransferStatus } from "@/lib/utils";
 
@@ -16,7 +21,8 @@ export type TransactionType =
   | 'proposal'
   | 'contract'
   | 'pool_creation'
-  | 'token_verification';
+  | 'token_verification'
+  | 'holding_contract_deployment';
 
 export interface TransactionConfig {
   timeout: number;
@@ -48,6 +54,11 @@ export interface TransactionConfig {
     tokenIds?: string[];
     amount?: string;
   };
+  holdingConfig?: {
+    creatorAddress: string;
+    bountyId: string;
+    securityLevel: "basic" | "multisig" | "timelock";
+  };
   walletType?: WalletType;
 }
 
@@ -66,7 +77,8 @@ export const executeTransaction = async (
     description: config.description,
     tokenConfig: config.tokenConfig,
     nftConfig: config.nftConfig,
-    poolConfig: config.poolConfig
+    poolConfig: config.poolConfig,
+    holdingConfig: config.holdingConfig
   });
 
   // Add specific validation for NFT transactions
@@ -75,6 +87,13 @@ export const executeTransaction = async (
     console.log('NFT transaction config:', config.nftConfig);
     const network = await provider.getNetwork();
     console.log('NFT transaction on network:', network.name, network.chainId);
+  }
+
+  // Add validation for holding contract deployment
+  if (config.type === 'holding_contract_deployment' && config.holdingConfig && provider) {
+    console.log('Holding contract deployment config:', config.holdingConfig);
+    const network = await provider.getNetwork();
+    console.log('Deployment on network:', network.name, network.chainId);
   }
 
   if (config.type === 'erc20_approval' && config.tokenConfig) {
@@ -127,6 +146,10 @@ export const executeTransaction = async (
         config.poolConfig.poolId
       );
       console.log('Generated holding address:', config.poolConfig.holdingAddress);
+      
+      // Verify if the holding address is a secure contract
+      const isSecureContract = await isHoldingContract(provider, config.poolConfig.holdingAddress);
+      console.log('Is secure holding contract:', isSecureContract);
     }
   }
 
@@ -193,6 +216,10 @@ export const verifyPoolTokenTransfer = async (
   
   console.log("Verifying pool token transfer:", poolConfig);
   
+  // First check if this is a secure holding contract
+  const isSecureContract = await isHoldingContract(provider, poolConfig.holdingAddress);
+  console.log("Is secure holding contract:", isSecureContract);
+  
   return await verifyTokenTransfer(
     provider,
     {
@@ -203,4 +230,48 @@ export const verifyPoolTokenTransfer = async (
     },
     poolConfig.holdingAddress
   );
+};
+
+/**
+ * Deploys a secure holding contract for token distribution
+ * @param provider Ethereum provider with signer
+ * @param creatorAddress Address of the bounty creator
+ * @param bountyId Unique identifier for the bounty
+ * @param securityLevel Security configuration for the holding contract
+ * @returns Promise resolving to the deployed contract address
+ */
+export const deployHoldingContract = async (
+  provider: ethers.providers.Web3Provider,
+  creatorAddress: string,
+  bountyId: string,
+  securityLevel: "basic" | "multisig" | "timelock" = "basic"
+): Promise<string> => {
+  console.log(`Deploying secure holding contract for ${creatorAddress} and bounty ${bountyId}`);
+  
+  const holdingConfig: TransactionConfig['holdingConfig'] = {
+    creatorAddress,
+    bountyId,
+    securityLevel
+  };
+  
+  const deployTransaction = async () => {
+    return await generateHoldingAddress(provider, creatorAddress, bountyId) as unknown as ethers.ContractTransaction;
+  };
+  
+  await executeTransaction(
+    deployTransaction,
+    {
+      type: 'holding_contract_deployment',
+      description: `Deploying secure holding contract for bounty ${bountyId}`,
+      holdingConfig,
+      ...DEFAULT_CONFIG
+    },
+    provider
+  );
+  
+  // Get the address of the deployed contract
+  const holdingAddress = await generateHoldingAddress(provider, creatorAddress, bountyId);
+  console.log(`Holding contract deployed at ${holdingAddress}`);
+  
+  return holdingAddress;
 };

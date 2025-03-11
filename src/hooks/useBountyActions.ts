@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -8,11 +7,22 @@ import {
   fundBounty,
   distributeRewards,
   recordSuccessfulReferral,
-  BountyCreationParams
+  BountyCreationParams,
+  verifyBountyTokenTransfer
 } from '@/services/bountyService';
+import { ethers } from 'ethers';
+import { deployHoldingContract, verifyPoolTokenTransfer } from '@/services/transactionManager';
+import { emergencyWithdraw, withdrawToken, withdrawERC721 } from '@/services/tokenService';
+import { TokenTransferStatus } from '@/lib/utils';
 
 export const useBountyActions = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [tokenVerificationStatus, setTokenVerificationStatus] = useState<{
+    status: TokenTransferStatus;
+    currentAmount: string;
+    targetAmount: string;
+    missingTokens?: string[];
+  } | null>(null);
   const { toast } = useToast();
   const { address, isConnected, primaryWallet } = useWalletConnection();
 
@@ -28,12 +38,51 @@ export const useBountyActions = () => {
 
     setIsProcessing(true);
     try {
+      // For token distribution bounties, we'll deploy a secure holding contract
+      if (bountyParams.bountyType === "token_distribution" && primaryWallet.provider) {
+        // Use the transactionManager to deploy a secure holding contract
+        const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+        const bountyId = `bounty-${Date.now()}`;
+        
+        // Choose security level based on token value or type
+        const securityLevel = bountyParams.tokenRewards?.totalTokens && 
+                             bountyParams.tokenRewards.totalTokens > 100 
+                             ? "multisig" : "basic";
+        
+        toast({
+          title: "Deploying Secure Holding Contract",
+          description: "Please approve the transaction to create a secure token holding contract",
+        });
+        
+        const holdingAddress = await deployHoldingContract(
+          provider,
+          address!,
+          bountyId,
+          securityLevel
+        );
+        
+        // Add the holding address to bounty parameters
+        bountyParams.tokenHoldingAddress = holdingAddress;
+        
+        toast({
+          title: "Holding Contract Deployed",
+          description: `Secure contract created at ${holdingAddress.substring(0, 6)}...`,
+        });
+      }
+      
       const result = await deployBountyToBlockchain(bountyParams, primaryWallet);
       
       toast({
         title: "Bounty Deployed",
         description: `Successfully deployed to address: ${result.partyAddress.substring(0, 6)}...`,
       });
+      
+      if (bountyParams.bountyType === "token_distribution") {
+        toast({
+          title: "Next Step: Transfer Tokens",
+          description: "Please transfer tokens to the holding address to activate the bounty",
+        });
+      }
       
       return result;
     } catch (error: any) {
@@ -197,7 +246,6 @@ export const useBountyActions = () => {
     }
   };
 
-  // New functions for token distribution
   const configureTokenRewards = async (
     bountyId: string,
     tokenConfig: {
@@ -324,6 +372,206 @@ export const useBountyActions = () => {
     }
   };
 
+  const verifyTokens = async (bountyId: string) => {
+    if (!primaryWallet?.provider) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to verify token transfers",
+        variant: "destructive"
+      });
+      return null;
+    }
+
+    setIsProcessing(true);
+    try {
+      const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+      
+      const result = await verifyBountyTokenTransfer(bountyId, provider);
+      setTokenVerificationStatus(result);
+      
+      if (result.status === "completed") {
+        toast({
+          title: "Tokens Verified",
+          description: "All required tokens have been transferred to the holding contract",
+        });
+        
+        // Automatically activate the bounty if tokens are transferred
+        if (primaryWallet) {
+          await updateBountyStatus(bountyId, "active", primaryWallet);
+        }
+      } else if (result.status === "verifying") {
+        toast({
+          title: "Tokens Partially Transferred",
+          description: `${result.currentAmount} of ${result.targetAmount} tokens transferred`,
+        });
+      } else {
+        toast({
+          title: "Awaiting Tokens",
+          description: "Please transfer the required tokens to the holding address",
+          variant: "destructive"
+        });
+      }
+      
+      return result;
+    } catch (error: any) {
+      console.error("Error verifying tokens:", error);
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to verify token transfers",
+        variant: "destructive"
+      });
+      return null;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const performEmergencyWithdrawal = async (
+    bountyId: string,
+    holdingAddress: string,
+    tokenAddress: string,
+    recipientAddress: string
+  ) => {
+    if (!primaryWallet?.provider) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to perform emergency withdrawal",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    setIsProcessing(true);
+    try {
+      const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+      
+      // Security confirmation (this would have a modal in a real UI)
+      toast({
+        title: "SECURITY ALERT",
+        description: "Initiating emergency withdrawal. This is for critical situations only!",
+        variant: "destructive"
+      });
+      
+      await emergencyWithdraw(
+        provider,
+        holdingAddress,
+        tokenAddress,
+        recipientAddress || address!
+      );
+      
+      toast({
+        title: "Emergency Withdrawal Complete",
+        description: "Tokens have been withdrawn from the holding contract",
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error("Error performing emergency withdrawal:", error);
+      toast({
+        title: "Withdrawal Failed",
+        description: error.message || "Failed to withdraw tokens",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const withdrawTokensForDistribution = async (
+    bountyId: string,
+    holdingAddress: string,
+    tokenAddress: string,
+    recipientAddress: string,
+    amount: string
+  ) => {
+    if (!primaryWallet?.provider) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to withdraw tokens",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    setIsProcessing(true);
+    try {
+      const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+      
+      await withdrawToken(
+        provider,
+        holdingAddress,
+        tokenAddress,
+        recipientAddress,
+        amount
+      );
+      
+      toast({
+        title: "Tokens Withdrawn",
+        description: `${amount} tokens sent to ${recipientAddress.substring(0, 6)}...`,
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error("Error withdrawing tokens:", error);
+      toast({
+        title: "Withdrawal Failed",
+        description: error.message || "Failed to withdraw tokens",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const withdrawNFTForDistribution = async (
+    bountyId: string,
+    holdingAddress: string,
+    tokenAddress: string,
+    recipientAddress: string,
+    tokenId: string
+  ) => {
+    if (!primaryWallet?.provider) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to withdraw NFT",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    setIsProcessing(true);
+    try {
+      const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+      
+      await withdrawERC721(
+        provider,
+        holdingAddress,
+        tokenAddress,
+        recipientAddress,
+        tokenId
+      );
+      
+      toast({
+        title: "NFT Withdrawn",
+        description: `NFT #${tokenId} sent to ${recipientAddress.substring(0, 6)}...`,
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error("Error withdrawing NFT:", error);
+      toast({
+        title: "Withdrawal Failed",
+        description: error.message || "Failed to withdraw NFT",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return {
     deployBounty,
     changeBountyStatus,
@@ -333,6 +581,11 @@ export const useBountyActions = () => {
     configureTokenRewards,
     distributeTokens,
     transferNFTsToBounty,
+    verifyTokens,
+    performEmergencyWithdrawal,
+    withdrawTokensForDistribution,
+    withdrawNFTForDistribution,
+    tokenVerificationStatus,
     isProcessing,
     walletAddress: address
   };

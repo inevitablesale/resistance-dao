@@ -16,6 +16,7 @@
     "@dynamic-labs/sdk-react-core": "^4.6.3",
     "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.0",
+    "@openzeppelin/contracts": "^4.9.3",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",

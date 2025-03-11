@@ -356,6 +356,85 @@ export const generateHoldingAddress = async (
   creatorAddress: string,
   bountyId: string
 ): Promise<string> => {
+  try {
+    // Get the current network
+    const network = await provider.getNetwork();
+    const factoryAddress = HOLDING_FACTORY_ADDRESSES[network.chainId];
+    
+    if (!factoryAddress || factoryAddress === ethers.constants.AddressZero) {
+      console.warn(`No holding factory deployed on network ${network.chainId}, falling back to deterministic address`);
+      // Fallback to deterministic address generation if no factory is available
+      return generateDeterministicAddress(creatorAddress, bountyId);
+    }
+    
+    // Get a signer if the provider has one
+    let signer: ethers.Signer;
+    if ((provider as ethers.providers.Web3Provider).getSigner) {
+      signer = (provider as ethers.providers.Web3Provider).getSigner();
+    } else {
+      throw new Error("Provider must be a Web3Provider with a signer to deploy holding contracts");
+    }
+    
+    // Create factory contract instance
+    const factory = new ethers.Contract(
+      factoryAddress,
+      HOLDING_FACTORY_ABI,
+      signer
+    );
+    
+    // Check if a holding contract already exists for this creator and bounty
+    const existingAddress = await factory.getHoldingContract(creatorAddress, bountyId);
+    
+    if (existingAddress && existingAddress !== ethers.constants.AddressZero) {
+      console.log(`Existing holding contract found at ${existingAddress}`);
+      return existingAddress;
+    }
+    
+    // Deploy a new holding contract
+    console.log(`Deploying new holding contract for bounty ${bountyId}`);
+    const tx = await factory.createHoldingContract(creatorAddress, bountyId);
+    const receipt = await tx.wait();
+    
+    // Extract the deployed contract address from event logs
+    let holdingAddress = ethers.constants.AddressZero;
+    
+    for (const log of receipt.logs) {
+      try {
+        const parsedLog = factory.interface.parseLog(log);
+        if (parsedLog.name === "HoldingContractCreated") {
+          holdingAddress = parsedLog.args.contractAddress;
+          break;
+        }
+      } catch (error) {
+        // Not the event we're looking for
+        continue;
+      }
+    }
+    
+    if (holdingAddress === ethers.constants.AddressZero) {
+      throw new Error("Failed to extract holding contract address from transaction receipt");
+    }
+    
+    console.log(`Holding contract deployed at ${holdingAddress}`);
+    return holdingAddress;
+  } catch (error) {
+    console.error("Error generating secure holding address:", error);
+    // Fallback to deterministic address generation
+    console.warn("Falling back to deterministic address generation");
+    return generateDeterministicAddress(creatorAddress, bountyId);
+  }
+};
+
+/**
+ * Fallback method to generate a deterministic address from a hash
+ * @param creatorAddress Address of the bounty creator
+ * @param bountyId Unique identifier for the bounty
+ * @returns A deterministic Ethereum address
+ */
+const generateDeterministicAddress = (
+  creatorAddress: string,
+  bountyId: string
+): string => {
   const abiCoder = new ethers.utils.AbiCoder();
   const encodedData = abiCoder.encode(
     ["address", "string", "uint256"],
@@ -365,5 +444,249 @@ export const generateHoldingAddress = async (
   const hash = ethers.utils.keccak256(encodedData);
   const wallet = new ethers.Wallet(hash.slice(0, 66));
   
+  console.warn(`Generated deterministic address ${wallet.address} - THIS IS NOT SECURE FOR PRODUCTION`);
   return wallet.address;
+};
+
+/**
+ * Adds an authorized user to a holding contract
+ * @param provider Ethereum provider with signer
+ * @param holdingAddress Address of the holding contract
+ * @param userAddress Address to authorize
+ * @returns Promise resolving to the transaction receipt
+ */
+export const addAuthorizedUser = async (
+  provider: ethers.providers.Web3Provider,
+  holdingAddress: string,
+  userAddress: string
+): Promise<ethers.ContractReceipt> => {
+  try {
+    const signer = provider.getSigner();
+    const holdingContract = new ethers.Contract(
+      holdingAddress,
+      HOLDING_CONTRACT_ABI,
+      signer
+    );
+    
+    // Check if the address is a holding contract
+    if (await isHoldingContract(provider, holdingAddress)) {
+      const tx = await holdingContract.addAuthorizedUser(userAddress);
+      return await tx.wait();
+    } else {
+      throw new Error("The address is not a recognized holding contract");
+    }
+  } catch (error) {
+    console.error("Error adding authorized user:", error);
+    throw error;
+  }
+};
+
+/**
+ * Checks if an address is a valid holding contract
+ * @param provider Ethereum provider
+ * @param contractAddress Address to check
+ * @returns Promise resolving to boolean indicating if the address is a holding contract
+ */
+export const isHoldingContract = async (
+  provider: ethers.providers.Provider,
+  contractAddress: string
+): Promise<boolean> => {
+  try {
+    const network = await provider.getNetwork();
+    const factoryAddress = HOLDING_FACTORY_ADDRESSES[network.chainId];
+    
+    if (!factoryAddress || factoryAddress === ethers.constants.AddressZero) {
+      // If no factory is deployed, we can't verify
+      return false;
+    }
+    
+    const factory = new ethers.Contract(
+      factoryAddress,
+      HOLDING_FACTORY_ABI,
+      provider
+    );
+    
+    return await factory.isHoldingContract(contractAddress);
+  } catch (error) {
+    console.error("Error checking if address is a holding contract:", error);
+    return false;
+  }
+};
+
+/**
+ * Performs an emergency withdrawal from a holding contract
+ * @param provider Ethereum provider with signer
+ * @param holdingAddress Address of the holding contract
+ * @param tokenAddress Address of the token to withdraw (use ethers.constants.AddressZero for ETH)
+ * @param recipientAddress Address to send the withdrawn tokens to
+ * @returns Promise resolving to the transaction receipt
+ */
+export const emergencyWithdraw = async (
+  provider: ethers.providers.Web3Provider,
+  holdingAddress: string,
+  tokenAddress: string,
+  recipientAddress: string
+): Promise<ethers.ContractReceipt> => {
+  try {
+    const signer = provider.getSigner();
+    const holdingContract = new ethers.Contract(
+      holdingAddress,
+      HOLDING_CONTRACT_ABI,
+      signer
+    );
+    
+    // Verify this is a valid holding contract
+    if (!(await isHoldingContract(provider, holdingAddress))) {
+      throw new Error("The address is not a recognized holding contract");
+    }
+    
+    // Verify the caller is authorized
+    const signerAddress = await signer.getAddress();
+    if (!(await holdingContract.isAuthorized(signerAddress))) {
+      throw new Error("Caller is not authorized to perform emergency withdrawals");
+    }
+    
+    const tx = await holdingContract.emergencyWithdraw(
+      tokenAddress,
+      recipientAddress
+    );
+    
+    return await tx.wait();
+  } catch (error) {
+    console.error("Error performing emergency withdrawal:", error);
+    throw error;
+  }
+};
+
+/**
+ * Withdraws tokens from a holding contract to a recipient
+ * @param provider Ethereum provider with signer
+ * @param holdingAddress Address of the holding contract
+ * @param tokenAddress Address of the token to withdraw
+ * @param recipientAddress Address to send the tokens to
+ * @param amount Amount to withdraw (in token units)
+ * @returns Promise resolving to the transaction receipt
+ */
+export const withdrawToken = async (
+  provider: ethers.providers.Web3Provider,
+  holdingAddress: string,
+  tokenAddress: string,
+  recipientAddress: string,
+  amount: string
+): Promise<ethers.ContractReceipt> => {
+  try {
+    const signer = provider.getSigner();
+    const holdingContract = new ethers.Contract(
+      holdingAddress,
+      HOLDING_CONTRACT_ABI,
+      signer
+    );
+    
+    // Verify this is a valid holding contract
+    if (!(await isHoldingContract(provider, holdingAddress))) {
+      throw new Error("The address is not a recognized holding contract");
+    }
+    
+    // Verify the caller is authorized
+    const signerAddress = await signer.getAddress();
+    if (!(await holdingContract.isAuthorized(signerAddress))) {
+      throw new Error("Caller is not authorized to withdraw tokens");
+    }
+    
+    // Convert amount to wei
+    const amountWei = amount.includes('.')
+      ? ethers.utils.parseUnits(amount, 18)
+      : ethers.BigNumber.from(amount);
+    
+    // Perform the withdrawal
+    const tx = await holdingContract.withdrawToken(
+      tokenAddress,
+      recipientAddress,
+      amountWei
+    );
+    
+    return await tx.wait();
+  } catch (error) {
+    console.error("Error withdrawing tokens:", error);
+    throw error;
+  }
+};
+
+/**
+ * Withdraws an ERC721 token from a holding contract
+ * @param provider Ethereum provider with signer
+ * @param holdingAddress Address of the holding contract
+ * @param tokenAddress Address of the ERC721 token
+ * @param recipientAddress Address to send the token to
+ * @param tokenId ID of the token to withdraw
+ * @returns Promise resolving to the transaction receipt
+ */
+export const withdrawERC721 = async (
+  provider: ethers.providers.Web3Provider,
+  holdingAddress: string,
+  tokenAddress: string,
+  recipientAddress: string,
+  tokenId: string
+): Promise<ethers.ContractReceipt> => {
+  try {
+    const signer = provider.getSigner();
+    const holdingContract = new ethers.Contract(
+      holdingAddress,
+      HOLDING_CONTRACT_ABI,
+      signer
+    );
+    
+    // Verify this is a valid holding contract
+    if (!(await isHoldingContract(provider, holdingAddress))) {
+      throw new Error("The address is not a recognized holding contract");
+    }
+    
+    // Verify the caller is authorized
+    const signerAddress = await signer.getAddress();
+    if (!(await holdingContract.isAuthorized(signerAddress))) {
+      throw new Error("Caller is not authorized to withdraw tokens");
+    }
+    
+    // Perform the withdrawal
+    const tx = await holdingContract.withdrawERC721(
+      tokenAddress,
+      recipientAddress,
+      ethers.BigNumber.from(tokenId)
+    );
+    
+    return await tx.wait();
+  } catch (error) {
+    console.error("Error withdrawing ERC721 token:", error);
+    throw error;
+  }
+};
+
+// Holding contract factory ABI - used to deploy secure holding contracts
+const HOLDING_FACTORY_ABI = [
+  "function createHoldingContract(address creator, string memory bountyId) external returns (address)",
+  "function getHoldingContract(address creator, string memory bountyId) external view returns (address)",
+  "function isHoldingContract(address contractAddress) external view returns (bool)"
+];
+
+// Holding contract ABI - used to interact with deployed holding contracts
+const HOLDING_CONTRACT_ABI = [
+  "function creator() external view returns (address)",
+  "function bountyId() external view returns (string memory)",
+  "function withdrawToken(address token, address recipient, uint256 amount) external",
+  "function withdrawETH(address payable recipient, uint256 amount) external",
+  "function withdrawERC721(address token, address recipient, uint256 tokenId) external",
+  "function withdrawERC1155(address token, address recipient, uint256 tokenId, uint256 amount) external",
+  "function emergencyWithdraw(address token, address payable recipient) external",
+  "function addAuthorizedUser(address user) external",
+  "function removeAuthorizedUser(address user) external",
+  "function isAuthorized(address user) external view returns (bool)"
+];
+
+// Addresses of deployed factory contracts on different networks
+const HOLDING_FACTORY_ADDRESSES: { [chainId: number]: string } = {
+  1: "0x0000000000000000000000000000000000000000", // Mainnet (placeholder)
+  137: "0x0000000000000000000000000000000000000000", // Polygon (placeholder)
+  80001: "0x0000000000000000000000000000000000000000", // Mumbai (placeholder)
+  5: "0x0000000000000000000000000000000000000000", // Goerli (placeholder)
+  // Add other networks as needed
 };

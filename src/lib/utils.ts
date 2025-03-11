@@ -95,3 +95,47 @@ export function getTokenTransferProgress(currentAmount: number, targetAmount: nu
 
 // Token transfer status types
 export type TokenTransferStatus = 'not_started' | 'awaiting_tokens' | 'verifying' | 'completed' | 'failed';
+
+/**
+ * Get security level description for holding contract
+ * @param securityLevel The security level of the holding contract
+ * @returns A user-friendly description of the security features
+ */
+export function getSecurityLevelDescription(securityLevel: "basic" | "multisig" | "timelock"): string {
+  switch(securityLevel) {
+    case 'basic':
+      return 'Basic security with single-signature control';
+    case 'multisig':
+      return 'Multi-signature security requiring multiple approvals for withdrawals';
+    case 'timelock':
+      return 'Time-locked security with delays on withdrawals for extra protection';
+    default:
+      return 'Standard security features';
+  }
+}
+
+/**
+ * Format contract creation timestamp
+ * @param timestamp Unix timestamp in seconds
+ * @returns Formatted date string
+ */
+export function formatContractCreationTime(timestamp: number): string {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleString();
+}
+
+/**
+ * Check if an address is a valid contract
+ * @param provider Ethereum provider
+ * @param address Contract address to check
+ * @returns Promise resolving to boolean indicating if the address is a contract
+ */
+export async function isContract(provider: ethers.providers.Provider, address: string): Promise<boolean> {
+  try {
+    const code = await provider.getCode(address);
+    return code !== '0x'; // If code length > 0, it's a contract
+  } catch (error) {
+    console.error("Error checking if address is a contract:", error);
+    return false;
+  }
+}
