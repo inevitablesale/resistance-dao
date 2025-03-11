@@ -1,234 +1,84 @@
-
-import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import React from 'react';
 import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clipboard, CheckCircle, AlertCircle, RefreshCcw } from 'lucide-react';
-import { 
-  getTokenTransferStatusMessage, 
-  TokenTransferStatus, 
-  getTokenTransferProgress 
-} from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { verifyBountyTokenTransfer } from '@/services/bountyService';
-import { useWalletProvider } from '@/hooks/useWalletProvider';
+import { shortenAddress, getTokenTransferStatusMessage, getTokenTransferProgress } from '@/lib/utils';
+import { Spinner } from '@/components/ui/spinner';
+import { ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import type { TokenTransferStatus } from '@/lib/utils';
 
 interface TokenTransferStatusProps {
-  bountyId: string;
-  holdingAddress: string;
-  tokenAddress: string;
-  tokenType: "erc20" | "erc721" | "erc1155";
   status: TokenTransferStatus;
-  currentAmount?: string;
-  targetAmount?: string;
-  onStatusChange?: (status: TokenTransferStatus) => void;
+  currentAmount: string;
+  targetAmount: string;
+  holdingAddress: string;
+  missingTokens?: string[];
+  onVerify?: () => void;
+  onActivate?: () => void;
 }
 
-export function TokenTransferStatus({
-  bountyId,
-  holdingAddress,
-  tokenAddress,
-  tokenType,
+const TokenTransferStatusDisplay: React.FC<TokenTransferStatusProps> = ({
   status,
-  currentAmount = "0",
-  targetAmount = "0",
-  onStatusChange
-}: TokenTransferStatusProps) {
-  const [transferStatus, setTransferStatus] = useState<TokenTransferStatus>(status);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [current, setCurrent] = useState(currentAmount);
-  const [target, setTarget] = useState(targetAmount);
-  const [missingTokens, setMissingTokens] = useState<string[]>([]);
-  const [progress, setProgress] = useState(0);
-  
-  const { toast } = useToast();
-  const { getProvider } = useWalletProvider();
-  
-  // Copy holding address to clipboard
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(holdingAddress);
-    toast({
-      title: "Address Copied",
-      description: "Holding address copied to clipboard"
-    });
-  };
-  
-  // Verify token transfer
-  const verifyTransfer = async () => {
-    try {
-      setIsVerifying(true);
-      
-      const { provider } = await getProvider();
-      const result = await verifyBountyTokenTransfer(bountyId, provider);
-      
-      setTransferStatus(result.status);
-      setCurrent(result.currentAmount);
-      setTarget(result.targetAmount);
-      
-      if (result.missingTokens) {
-        setMissingTokens(result.missingTokens);
-      }
-      
-      // Calculate progress percentage
-      const progressValue = getTokenTransferProgress(
-        parseFloat(result.currentAmount), 
-        parseFloat(result.targetAmount)
-      );
-      setProgress(progressValue);
-      
-      // Notify parent component of status change
-      if (onStatusChange) {
-        onStatusChange(result.status);
-      }
-      
-      // Show appropriate toast based on status
-      if (result.status === "completed") {
-        toast({
-          title: "Transfer Verified",
-          description: "All tokens have been received!",
-          variant: "default"
-        });
-      } else if (result.status === "verifying") {
-        toast({
-          title: "Partial Transfer Detected",
-          description: `Received ${result.currentAmount} of ${result.targetAmount} tokens`,
-          variant: "default"
-        });
-      } else if (result.status === "failed") {
-        toast({
-          title: "Verification Failed",
-          description: "Could not verify token transfer",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error("Error verifying transfer:", error);
-      toast({
-        title: "Verification Error",
-        description: error instanceof Error ? error.message : "Failed to verify token transfer",
-        variant: "destructive"
-      });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-  
-  // Update progress when current/target amounts change
-  useEffect(() => {
-    const progressValue = getTokenTransferProgress(
-      parseFloat(current), 
-      parseFloat(target)
-    );
-    setProgress(progressValue);
-  }, [current, target]);
-  
-  // Select alert variant based on status
-  const getAlertVariant = () => {
-    switch (transferStatus) {
-      case "completed":
-        return "default";
-      case "verifying":
-        return "default";
-      case "failed":
-        return "destructive";
-      default:
-        return "default";
-    }
-  };
-  
-  // Get icon based on status
-  const getStatusIcon = () => {
-    switch (transferStatus) {
-      case "completed":
-        return <CheckCircle className="h-4 w-4" />;
-      case "failed":
-        return <AlertCircle className="h-4 w-4" />;
-      default:
-        return null;
-    }
-  };
-  
-  // Get token type display text
-  const getTokenTypeDisplay = () => {
-    switch (tokenType) {
-      case "erc20":
-        return "tokens";
-      case "erc721":
-        return "NFTs";
-      case "erc1155":
-        return "tokens";
-      default:
-        return "tokens";
-    }
-  };
-  
+  currentAmount,
+  targetAmount,
+  holdingAddress,
+  missingTokens = [],
+  onVerify,
+  onActivate
+}) => {
+  const statusMessage = getTokenTransferStatusMessage(status);
+  const progress = getTokenTransferProgress(Number(currentAmount), Number(targetAmount));
+
   return (
-    <div className="space-y-4">
-      <Alert variant={getAlertVariant()}>
-        <AlertTitle className="flex items-center">
-          {getStatusIcon()}
-          <span className="ml-2">{getTokenTransferStatusMessage(transferStatus)}</span>
-        </AlertTitle>
-        <AlertDescription>
-          Transfer your {getTokenTypeDisplay()} to the holding address below to activate your pool.
-        </AlertDescription>
-      </Alert>
-      
-      <div className="p-4 border rounded-md bg-muted/50">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium">Holding Address:</span>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={copyToClipboard} 
-            className="h-8 gap-1"
-          >
-            <Clipboard className="h-4 w-4" />
-            Copy
-          </Button>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Token Transfer Status</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center space-x-4">
+          {status === 'verifying' || status === 'awaiting_tokens' ? (
+            <Spinner />
+          ) : status === 'completed' ? (
+            <CheckCircle2 className="text-green-500 h-6 w-6" />
+          ) : (
+            <AlertCircle className="text-red-500 h-6 w-6" />
+          )}
+          <p>{statusMessage}</p>
         </div>
-        <code className="block p-2 bg-background rounded text-xs break-all">
-          {holdingAddress}
-        </code>
-        
-        <div className="mt-4 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Progress:</span>
-            <span>{current} / {target} {getTokenTypeDisplay()}</span>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
-        
+        <Progress value={progress} className="mt-2" />
+        <p className="text-sm text-muted-foreground mt-1">
+          {currentAmount} / {targetAmount}
+        </p>
         {missingTokens.length > 0 && (
-          <div className="mt-4">
-            <span className="text-sm font-medium">Missing tokens:</span>
-            <ul className="mt-1 text-xs space-y-1">
-              {missingTokens.map((token, i) => (
-                <li key={i} className="text-muted-foreground">{token}</li>
+          <div className="mt-2">
+            <p className="text-sm font-medium">Missing Tokens:</p>
+            <ul className="list-disc pl-4 text-sm text-red-500">
+              {missingTokens.map((token, index) => (
+                <li key={index}>{token}</li>
               ))}
             </ul>
           </div>
         )}
-      </div>
-      
-      <Button 
-        onClick={verifyTransfer} 
-        disabled={isVerifying}
-        className="w-full"
-      >
-        {isVerifying ? (
-          <>
-            <RefreshCcw className="mr-2 h-4 w-4 animate-spin" />
-            Verifying...
-          </>
-        ) : (
-          <>
-            <RefreshCcw className="mr-2 h-4 w-4" />
-            Verify Transfer
-          </>
+        <div className="mt-4">
+          <p className="text-sm text-muted-foreground">
+            Holding Address: {shortenAddress(holdingAddress)}
+          </p>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        {onVerify && status !== 'completed' && (
+          <Button onClick={onVerify} disabled={status === 'verifying'}>
+            {status === 'verifying' ? 'Verifying...' : 'Verify Tokens'}
+          </Button>
         )}
-      </Button>
-    </div>
+        {onActivate && status === 'completed' && (
+          <Button onClick={onActivate}>
+            Activate Bounty <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
-}
+};
+
+export default TokenTransferStatusDisplay;

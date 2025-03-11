@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ethers } from "ethers";
@@ -11,12 +10,10 @@ export function formatRDAmount(amount: string | number | ethers.BigNumber): stri
   if (!amount) return "0 RD";
   
   try {
-    // If it's already a string and contains a decimal, assume it's already formatted
     if (typeof amount === 'string' && amount.includes('.')) {
       return `${amount} RD`;
     }
     
-    // Handle BigNumber or numeric string
     const formattedAmount = ethers.utils.formatEther(
       typeof amount === 'string' || typeof amount === 'number' 
         ? ethers.utils.parseEther(amount.toString())
@@ -26,7 +23,7 @@ export function formatRDAmount(amount: string | number | ethers.BigNumber): stri
     return `${formattedAmount} RD`;
   } catch (error) {
     console.error('Error formatting RD amount:', error);
-    return `${amount} RD`; // Return original amount if formatting fails
+    return `${amount} RD`;
   }
 }
 
@@ -53,7 +50,6 @@ export function truncateAddress(address: string, startChars: number = 6, endChar
 export function shortenAddress(address: string, chars = 4): string {
   if (!address) return '';
   
-  // Validate address format
   if (!address.startsWith('0x') || address.length !== 42) {
     return address;
   }
@@ -133,7 +129,7 @@ export function formatContractCreationTime(timestamp: number): string {
 export async function isContract(provider: ethers.providers.Provider, address: string): Promise<boolean> {
   try {
     const code = await provider.getCode(address);
-    return code !== '0x'; // If code length > 0, it's a contract
+    return code !== '0x';
   } catch (error) {
     console.error("Error checking if address is a contract:", error);
     return false;

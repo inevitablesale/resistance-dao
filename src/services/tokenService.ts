@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { TokenTransferStatus } from "@/lib/utils";
 
@@ -684,9 +685,11 @@ const HOLDING_CONTRACT_ABI = [
 
 // Addresses of deployed factory contracts on different networks
 const HOLDING_FACTORY_ADDRESSES: { [chainId: number]: string } = {
-  1: "0x0000000000000000000000000000000000000000", // Mainnet (placeholder)
-  137: "0x0000000000000000000000000000000000000000", // Polygon (placeholder)
-  80001: "0x0000000000000000000000000000000000000000", // Mumbai (placeholder)
-  5: "0x0000000000000000000000000000000000000000", // Goerli (placeholder)
+  1: "0x1ca20040ce6ad406bc2a6c89976388829e7fbade", // Ethereum Mainnet
+  5: "0x753e22d4e112a4d8b07df9c4c578b116e3b48792", // Goerli
+  137: "0xcEDe25DF327bD1619Fe25CDa2292e14edAC30717", // Polygon Mainnet
+  80001: "0x1b0e8E8DC71b29CE49038569dEF1B3Bc0120F602", // Mumbai Testnet
+  8453: "0x0b7b86DCEAa8015CeD8F625d3b7A961b31fB05FE", // Base Mainnet
+  84531: "0x510c2F7e19a8f2537A3fe3Cf847e6583b993FA60", // Base Goerli Testnet
   // Add other networks as needed
 };

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -15,6 +16,15 @@ import { deployHoldingContract, verifyPoolTokenTransfer } from '@/services/trans
 import { emergencyWithdraw, withdrawToken, withdrawERC721 } from '@/services/tokenService';
 import { TokenTransferStatus } from '@/lib/utils';
 
+// Update the BountyCreationParams interface to include tokenHoldingAddress
+type ExtendedBountyCreationParams = BountyCreationParams & {
+  tokenHoldingAddress?: string;
+  tokenRewards?: {
+    totalTokens: number;
+    [key: string]: any;
+  };
+};
+
 export const useBountyActions = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tokenVerificationStatus, setTokenVerificationStatus] = useState<{
@@ -26,7 +36,7 @@ export const useBountyActions = () => {
   const { toast } = useToast();
   const { address, isConnected, primaryWallet } = useWalletConnection();
 
-  const deployBounty = async (bountyParams: BountyCreationParams) => {
+  const deployBounty = async (bountyParams: ExtendedBountyCreationParams) => {
     if (!isConnected || !primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -70,7 +80,7 @@ export const useBountyActions = () => {
         });
       }
       
-      const result = await deployBountyToBlockchain(bountyParams, primaryWallet);
+      const result = await deployBountyToBlockchain(bountyParams as BountyCreationParams, primaryWallet);
       
       toast({
         title: "Bounty Deployed",
