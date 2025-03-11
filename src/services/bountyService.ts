@@ -1,8 +1,9 @@
+
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
 import { toast } from "@/hooks/use-toast";
-import { createBountyParty, createEthCrowdfund } from "./partyProtocolService";
+import { createBountyParty, createEthCrowdfund, getPartyDetails, getPartyProposals } from "./partyProtocolService";
 import { uploadToIPFS, getFromIPFS } from "./ipfsService";
 
 export interface Bounty {
@@ -55,142 +56,169 @@ const calculateRemainingBudget = (bounty: Bounty): Bounty => {
   };
 };
 
-// Cache for bounties to avoid excessive blockchain calls
-let bountiesCache: Bounty[] = [];
-let lastCacheUpdate = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
 /**
- * Get bounties from the blockchain
+ * Get bounties from the blockchain by querying the subgraph or indexer
  * @param status Optional status filter
  * @returns Promise with array of bounties
  */
 export const getBounties = async (status?: string): Promise<Bounty[]> => {
   console.log("Getting bounties with status filter:", status);
   
-  const now = Date.now();
-  if (bountiesCache.length > 0 && now - lastCacheUpdate < CACHE_DURATION) {
-    console.log("Using cached bounties data");
-    let filteredBounties = [...bountiesCache];
-    
-    if (status) {
-      filteredBounties = filteredBounties.filter(b => b.status === status);
-    }
-    
-    return filteredBounties;
-  }
-  
   try {
-    // In a production app, this would:
-    // 1. Query an indexer or subgraph for all bounties created through our protocol
-    // 2. Fetch metadata from IPFS for each bounty
-    // 3. Get on-chain data about each bounty's current state
+    // In a real implementation, we query an indexer or subgraph for all bounty parties
+    // This would typically be a GraphQL query to something like The Graph protocol
     
-    // For now, we'll use our existing mock data as a placeholder
-    // but in a real implementation this would be replaced with blockchain calls
+    // This is the actual implementation that would query all bounty parties from a subgraph
+    // const subgraphEndpoint = "https://api.thegraph.com/subgraphs/name/partyprotocol/bounties";
+    // const query = `
+    //   {
+    //     bountyParties(where: { type: "bounty" }) {
+    //       id
+    //       metadataURI
+    //       crowdfundAddress
+    //       votingEnds
+    //       createdAt
+    //     }
+    //   }
+    // `;
+    // const response = await fetch(subgraphEndpoint, {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ query })
+    // });
+    // const data = await response.json();
+    // const partyAddresses = data.data.bountyParties.map(party => party.id);
+    
+    // Since we don't have an actual subgraph yet, we'll retrieve a list of parties 
+    // from the contract events directly
     
     const fetchedBounties: Bounty[] = [];
     
-    // The following code simulates what would happen in a real blockchain implementation:
-    
-    // 1. We'd first query an indexer or subgraph for all bounty party addresses
-    // const partyAddresses = await queryBountyPartiesFromSubgraph();
-    
-    // 2. For each address, we'd fetch the party details and metadata
-    // for (const partyAddress of partyAddresses) {
-    //   const partyDetails = await getPartyDetails(provider, partyAddress);
-    //   const metadataURI = partyDetails.metadataURI;
-    //   const metadata = await getFromIPFS(metadataURI.replace('ipfs://', ''), 'proposal');
-    //   
-    //   // 3. We'd construct the bounty object from the party and metadata
-    //   fetchedBounties.push({
-    //     id: partyAddress,
-    //     name: metadata.name,
-    //     description: metadata.description,
-    //     ...
-    //   });
-    // }
-    
-    // For now, simulate a delay for API/blockchain call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Mock data that we'll soon replace with actual blockchain calls
-    fetchedBounties.push(
-      {
-        id: "b1",
-        name: "Referral Program Alpha",
-        description: "Bring in new members to earn tokens. Each successful referral will be rewarded.",
-        rewardAmount: 5,
-        totalBudget: 500,
-        usedBudget: 125,
-        successCount: 25,
-        hunterCount: 8,
-        expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
-        status: "active",
-        partyAddress: "0x1234567890123456789012345678901234567890",
-        eligibleNFTs: ["0x123", "0x456"],
-        requireVerification: true,
-        allowPublicHunters: true,
-        maxReferralsPerHunter: 10,
-        bountyType: "nft_referral",
-        crowdfundAddress: "0x0987654321098765432109876543210987654321",
-        metadataURI: "ipfs://QmXyz"
-      },
-      {
-        id: "b2",
-        name: "NFT Launch Promotion",
-        description: "Help promote our new NFT collection. Rewards for each successful sale through your link.",
-        rewardAmount: 10,
-        totalBudget: 1000,
-        usedBudget: 200,
-        successCount: 20,
-        hunterCount: 5,
-        expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15, // 15 days from now
-        status: "active",
-        partyAddress: null,
-        eligibleNFTs: [],
-        requireVerification: false,
-        allowPublicHunters: true,
-        maxReferralsPerHunter: 5,
-        bountyType: "token_referral",
-        crowdfundAddress: null,
-        metadataURI: null
-      },
-      {
-        id: "b3",
-        name: "Community Expansion",
-        description: "Grow our Discord community with active members. Rewards for each member that stays active for 7 days.",
-        rewardAmount: 2,
-        totalBudget: 200,
-        usedBudget: 46,
-        successCount: 23,
-        hunterCount: 12,
-        expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 60, // 60 days from now
-        status: "active",
-        partyAddress: null,
-        eligibleNFTs: [],
-        requireVerification: true,
-        allowPublicHunters: false,
-        maxReferralsPerHunter: 20,
-        bountyType: "social_media",
-        crowdfundAddress: null,
-        metadataURI: null
-      }
+    // Temporary measure until subgraph is available - get parties from contract events
+    // In production, this would use a proper subgraph or indexer
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://polygon-rpc.com"
     );
     
-    // Update cache
-    if (fetchedBounties.length > 0) {
-      bountiesCache = fetchedBounties.map(b => calculateRemainingBudget(b));
-      lastCacheUpdate = now;
+    // Get party contract factory
+    const partyFactory = new ethers.Contract(
+      "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Party Protocol factory on Polygon
+      [
+        "event PartyCreated(address indexed partyAddress, address indexed creator, string metadata)",
+        "function getParties() external view returns (address[])"
+      ],
+      provider
+    );
+    
+    // Get all parties (this is inefficient but works until we have a subgraph)
+    let partyAddresses;
+    try {
+      partyAddresses = await partyFactory.getParties();
+    } catch (error) {
+      console.error("Error fetching parties from contract:", error);
+      
+      // Fallback to empty array if contract doesn't exist yet
+      partyAddresses = [];
     }
     
-    let filteredBounties = [...bountiesCache];
-    
-    if (status) {
-      filteredBounties = filteredBounties.filter(b => b.status === status);
+    // For each party, check if it's a bounty party by looking at its metadata
+    for (const partyAddress of partyAddresses) {
+      try {
+        // Get party details
+        const partyDetails = await getPartyDetails(provider, partyAddress);
+        
+        // Skip if not a bounty
+        if (!partyDetails.metadataURI) continue;
+        
+        // Fetch and parse metadata
+        const metadata = await getFromIPFS(
+          partyDetails.metadataURI.replace('ipfs://', ''),
+          'bounty'
+        );
+        
+        // Skip if not a bounty type
+        if (!metadata.bountyType) continue;
+        
+        // Get proposals to calculate success count
+        const proposals = await getPartyProposals(provider, partyAddress);
+        const successfulProposals = proposals.filter(p => p.status === 'executed');
+        
+        // Get crowdfund details to calculate used budget
+        const crowdfundContract = partyDetails.crowdfundAddress ? 
+          new ethers.Contract(
+            partyDetails.crowdfundAddress,
+            [
+              "function totalContributions() external view returns (uint256)",
+              "function getTotalParticipants() external view returns (uint256)"
+            ],
+            provider
+          ) : null;
+          
+        let totalBudget = 0;
+        let hunterCount = 0;
+        let usedBudget = 0;
+        
+        if (crowdfundContract) {
+          try {
+            totalBudget = parseFloat(ethers.utils.formatEther(
+              await crowdfundContract.totalContributions()
+            ));
+            hunterCount = (await crowdfundContract.getTotalParticipants()).toNumber();
+          } catch (error) {
+            console.error("Error fetching crowdfund details:", error);
+          }
+        }
+        
+        // Calculate used budget based on successful proposals
+        usedBudget = successfulProposals.reduce((total, proposal) => {
+          return total + proposal.totalValue;
+        }, 0);
+        
+        // Determine status
+        const now = Math.floor(Date.now() / 1000);
+        let bountyStatus: "active" | "paused" | "expired" | "completed" = "active";
+        
+        if (partyDetails.votingEnds < now) {
+          bountyStatus = "expired";
+        } else if (usedBudget >= totalBudget) {
+          bountyStatus = "completed";
+        } else if (metadata.status === "paused") {
+          bountyStatus = "paused";
+        }
+        
+        // Skip if doesn't match status filter
+        if (status && bountyStatus !== status) continue;
+        
+        // Create bounty object
+        const bounty: Bounty = {
+          id: partyAddress,
+          name: metadata.name,
+          description: metadata.description,
+          rewardAmount: metadata.rewardAmount,
+          totalBudget,
+          usedBudget,
+          successCount: successfulProposals.length,
+          hunterCount,
+          expiresAt: partyDetails.votingEnds,
+          status: bountyStatus,
+          partyAddress,
+          eligibleNFTs: metadata.eligibleNFTs || [],
+          requireVerification: metadata.requireVerification,
+          allowPublicHunters: metadata.allowPublicHunters,
+          maxReferralsPerHunter: metadata.maxReferralsPerHunter,
+          bountyType: metadata.bountyType,
+          crowdfundAddress: partyDetails.crowdfundAddress,
+          metadataURI: partyDetails.metadataURI
+        };
+        
+        fetchedBounties.push(calculateRemainingBudget(bounty));
+      } catch (error) {
+        console.error(`Error processing party ${partyAddress}:`, error);
+        // Continue to next party
+      }
     }
     
-    return filteredBounties;
+    return fetchedBounties;
   } catch (error) {
     console.error("Error fetching bounties:", error);
     return [];
@@ -199,21 +227,96 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
 
 export const getBounty = async (bountyId: string): Promise<Bounty | null> => {
   try {
-    // First check cache
-    const cachedBounty = bountiesCache.find(b => b.id === bountyId);
-    if (cachedBounty) {
-      return cachedBounty;
+    if (!bountyId) return null;
+    
+    // Query the specific bounty directly from the blockchain
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://polygon-rpc.com"
+    );
+    
+    // Get party details
+    const partyDetails = await getPartyDetails(provider, bountyId);
+    
+    if (!partyDetails.metadataURI) {
+      throw new Error("Invalid bounty: no metadata URI");
     }
     
-    // If not in cache, fetch all bounties
-    const bounties = await getBounties();
-    const bounty = bounties.find(b => b.id === bountyId);
-    return bounty || null;
+    // Fetch and parse metadata
+    const metadata = await getFromIPFS(
+      partyDetails.metadataURI.replace('ipfs://', ''),
+      'bounty'
+    );
     
-    // In a real implementation, we'd query the specific bounty by ID:
-    // const bountyDetails = await getBountyPartyDetails(provider, bountyId);
-    // const metadata = await getFromIPFS(bountyDetails.metadataURI);
-    // return { ... };
+    // Get proposals to calculate success count
+    const proposals = await getPartyProposals(provider, bountyId);
+    const successfulProposals = proposals.filter(p => p.status === 'executed');
+    
+    // Get crowdfund details
+    const crowdfundContract = partyDetails.crowdfundAddress ? 
+      new ethers.Contract(
+        partyDetails.crowdfundAddress,
+        [
+          "function totalContributions() external view returns (uint256)",
+          "function getTotalParticipants() external view returns (uint256)"
+        ],
+        provider
+      ) : null;
+      
+    let totalBudget = 0;
+    let hunterCount = 0;
+    let usedBudget = 0;
+    
+    if (crowdfundContract) {
+      try {
+        totalBudget = parseFloat(ethers.utils.formatEther(
+          await crowdfundContract.totalContributions()
+        ));
+        hunterCount = (await crowdfundContract.getTotalParticipants()).toNumber();
+      } catch (error) {
+        console.error("Error fetching crowdfund details:", error);
+      }
+    }
+    
+    // Calculate used budget based on successful proposals
+    usedBudget = successfulProposals.reduce((total, proposal) => {
+      return total + proposal.totalValue;
+    }, 0);
+    
+    // Determine status
+    const now = Math.floor(Date.now() / 1000);
+    let bountyStatus: "active" | "paused" | "expired" | "completed" = "active";
+    
+    if (partyDetails.votingEnds < now) {
+      bountyStatus = "expired";
+    } else if (usedBudget >= totalBudget) {
+      bountyStatus = "completed";
+    } else if (metadata.status === "paused") {
+      bountyStatus = "paused";
+    }
+    
+    // Create bounty object
+    const bounty: Bounty = {
+      id: bountyId,
+      name: metadata.name,
+      description: metadata.description,
+      rewardAmount: metadata.rewardAmount,
+      totalBudget,
+      usedBudget,
+      successCount: successfulProposals.length,
+      hunterCount,
+      expiresAt: partyDetails.votingEnds,
+      status: bountyStatus,
+      partyAddress: bountyId,
+      eligibleNFTs: metadata.eligibleNFTs || [],
+      requireVerification: metadata.requireVerification,
+      allowPublicHunters: metadata.allowPublicHunters,
+      maxReferralsPerHunter: metadata.maxReferralsPerHunter,
+      bountyType: metadata.bountyType,
+      crowdfundAddress: partyDetails.crowdfundAddress,
+      metadataURI: partyDetails.metadataURI
+    };
+    
+    return calculateRemainingBudget(bounty);
   } catch (error) {
     console.error("Error fetching bounty details:", error);
     return null;
@@ -222,22 +325,37 @@ export const getBounty = async (bountyId: string): Promise<Bounty | null> => {
 
 export const createBounty = async (
   params: BountyCreationParams,
-  wallet: any
+  wallet: ethers.Signer
 ): Promise<Bounty> => {
   console.log("Creating bounty with params:", params);
-  console.log("Using wallet:", wallet?.address);
+  console.log("Using wallet:", await wallet.getAddress());
   
   if (!wallet) {
     throw new Error("Wallet not connected");
   }
   
   try {
-    // Generate a bounty ID (this would be the Party address in production)
-    const bountyId = `b${Math.floor(Math.random() * 10000)}`;
+    // First, deploy the bounty to blockchain using Party Protocol
+    const { partyAddress, crowdfundAddress, metadataURI } = await deployBountyToBlockchain(
+      {
+        name: params.name,
+        description: params.description,
+        rewardAmount: params.rewardAmount,
+        totalBudget: params.totalBudget,
+        duration: params.duration,
+        requireVerification: params.requireVerification,
+        allowPublicHunters: params.allowPublicHunters,
+        maxReferralsPerHunter: params.maxReferralsPerHunter,
+        eligibleNFTs: params.eligibleNFTs,
+        bountyType: params.bountyType,
+        successCriteria: params.successCriteria
+      },
+      wallet
+    );
     
-    // Create a new bounty object
+    // Return the new bounty with blockchain data
     const newBounty: Bounty = {
-      id: bountyId,
+      id: partyAddress,
       name: params.name,
       description: params.description,
       rewardAmount: params.rewardAmount,
@@ -247,19 +365,16 @@ export const createBounty = async (
       hunterCount: 0,
       expiresAt: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * params.duration),
       status: "active",
-      partyAddress: null,
+      partyAddress,
       eligibleNFTs: params.eligibleNFTs,
       requireVerification: params.requireVerification,
       allowPublicHunters: params.allowPublicHunters,
       maxReferralsPerHunter: params.maxReferralsPerHunter,
       bountyType: params.bountyType,
       remainingBudget: params.totalBudget,
-      crowdfundAddress: null,
-      metadataURI: null
+      crowdfundAddress,
+      metadataURI
     };
-    
-    // Add to cache
-    bountiesCache.push(newBounty);
     
     return newBounty;
   } catch (error) {
@@ -269,10 +384,22 @@ export const createBounty = async (
 };
 
 export const deployBountyToBlockchain = async (
-  bountyId: string,
-  wallet: any
-): Promise<{ partyAddress: string; crowdfundAddress?: string }> => {
-  console.log(`Deploying bounty ${bountyId} to blockchain`);
+  bountyParams: {
+    name: string;
+    description: string;
+    rewardAmount: number;
+    totalBudget: number;
+    duration: number;
+    requireVerification: boolean;
+    allowPublicHunters: boolean;
+    maxReferralsPerHunter: number;
+    eligibleNFTs: string[];
+    bountyType: "nft_referral" | "token_referral" | "social_media";
+    successCriteria: string;
+  },
+  wallet: ethers.Signer
+): Promise<{ partyAddress: string; crowdfundAddress: string; metadataURI: string }> => {
+  console.log(`Deploying bounty to blockchain`);
   
   if (!wallet) {
     throw new ProposalError({
@@ -283,52 +410,42 @@ export const deployBountyToBlockchain = async (
   }
   
   try {
-    console.log("Using wallet for deployment:", wallet?.address);
-    
-    // Get the bounty to deploy
-    const bounty = await getBounty(bountyId);
-    
-    if (!bounty) {
-      throw new Error("Bounty not found");
-    }
-    
-    if (bounty.partyAddress) {
-      throw new Error("Bounty already deployed");
-    }
+    console.log("Using wallet for deployment:", await wallet.getAddress());
     
     // Prepare Party Protocol options for bounty
     const now = Math.floor(Date.now() / 1000);
     const bountyPartyOptions = {
-      name: `Bounty: ${bounty.name}`,
+      name: `Bounty: ${bountyParams.name}`,
       hosts: [await wallet.getAddress()], // Bounty creator as host
       votingDuration: 60 * 60 * 24 * 3, // 3 days
       executionDelay: 60 * 60 * 24, // 1 day
       passThresholdBps: 5000, // 50%
       allowPublicProposals: false, // Only hosts can make proposals
-      description: bounty.description,
+      description: bountyParams.description,
       
       // Bounty-specific options
-      rewardAmount: bounty.rewardAmount,
+      rewardAmount: bountyParams.rewardAmount,
       maxParticipants: 1000, // Arbitrary large number
       startTime: now,
-      endTime: bounty.expiresAt,
-      verificationRequired: bounty.requireVerification,
-      targetRequirements: bounty.eligibleNFTs
+      endTime: now + (60 * 60 * 24 * bountyParams.duration),
+      verificationRequired: bountyParams.requireVerification,
+      targetRequirements: bountyParams.eligibleNFTs
     };
     
     // Upload bounty metadata to IPFS
     const bountyMetadata = {
-      name: bounty.name,
-      description: bounty.description,
-      bountyType: bounty.bountyType,
-      rewardAmount: bounty.rewardAmount,
-      totalBudget: bounty.totalBudget,
-      allowPublicHunters: bounty.allowPublicHunters,
-      maxReferralsPerHunter: bounty.maxReferralsPerHunter,
-      requireVerification: bounty.requireVerification,
-      eligibleNFTs: bounty.eligibleNFTs,
+      name: bountyParams.name,
+      description: bountyParams.description,
+      bountyType: bountyParams.bountyType,
+      rewardAmount: bountyParams.rewardAmount,
+      totalBudget: bountyParams.totalBudget,
+      allowPublicHunters: bountyParams.allowPublicHunters,
+      maxReferralsPerHunter: bountyParams.maxReferralsPerHunter,
+      requireVerification: bountyParams.requireVerification,
+      eligibleNFTs: bountyParams.eligibleNFTs,
+      successCriteria: bountyParams.successCriteria,
       createdAt: now,
-      expiresAt: bounty.expiresAt
+      expiresAt: now + (60 * 60 * 24 * bountyParams.duration)
     };
     
     const metadataURI = await uploadToIPFS(bountyMetadata);
@@ -350,10 +467,10 @@ export const deployBountyToBlockchain = async (
     
     const crowdfundOptions = {
       initialContributor: userAddress,
-      minContribution: "0.01", // Small minimum to allow most users
-      maxContribution: bounty.totalBudget.toString(), // Full budget amount
-      maxTotalContributions: (bounty.totalBudget * 2).toString(), // Allow for additional funding
-      duration: bounty.expiresAt - now // Duration until expiry
+      minContribution: ethers.utils.parseEther("0.01"), // Small minimum to allow most users
+      maxContribution: ethers.utils.parseEther(bountyParams.totalBudget.toString()), // Full budget amount
+      maxTotalContributions: ethers.utils.parseEther((bountyParams.totalBudget * 2).toString()), // Allow for additional funding
+      duration: (60 * 60 * 24 * bountyParams.duration) // Duration until expiry
     };
     
     const crowdfundAddress = await createEthCrowdfund(
@@ -365,20 +482,10 @@ export const deployBountyToBlockchain = async (
     
     console.log(`Bounty crowdfund created at address: ${crowdfundAddress}`);
     
-    // Update the bounty in the cache
-    const bountyIndex = bountiesCache.findIndex(b => b.id === bountyId);
-    if (bountyIndex !== -1) {
-      bountiesCache[bountyIndex] = {
-        ...bountiesCache[bountyIndex],
-        partyAddress,
-        crowdfundAddress,
-        metadataURI
-      };
-    }
-    
     return { 
       partyAddress, 
-      crowdfundAddress 
+      crowdfundAddress,
+      metadataURI
     };
   } catch (error) {
     console.error("Error deploying bounty:", error);
@@ -402,32 +509,58 @@ export const deployBountyToBlockchain = async (
 export const recordSuccessfulReferral = async (
   bountyId: string,
   referrerId: string,
-  referredUser: string
+  referredUser: string,
+  wallet: ethers.Signer
 ): Promise<{ success: boolean, error?: string }> => {
   console.log(`Recording successful referral for bounty ${bountyId} by ${referrerId} for user ${referredUser}`);
   
   try {
-    const bounty = await getBounty(bountyId);
-    if (!bounty) return { success: false, error: "Bounty not found" };
-    
-    // In a real implementation, this would:
-    // 1. Check the bounty's Party contract to verify it's valid
-    // 2. Create a proposal to reward the referrer
-    // 3. Execute the proposal if auto-approval is enabled
-    
-    // For now, update the cache data
-    const bountyIndex = bountiesCache.findIndex(b => b.id === bountyId);
-    if (bountyIndex !== -1) {
-      bountiesCache[bountyIndex] = {
-        ...bountiesCache[bountyIndex],
-        successCount: bountiesCache[bountyIndex].successCount + 1,
-        usedBudget: bountiesCache[bountyIndex].usedBudget + bountiesCache[bountyIndex].rewardAmount,
-        remainingBudget: bountiesCache[bountyIndex].totalBudget - (bountiesCache[bountyIndex].usedBudget + bountiesCache[bountyIndex].rewardAmount)
-      };
+    if (!wallet) {
+      return { success: false, error: "Wallet not connected" };
     }
     
-    // Simulate a delay for blockchain transaction
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (!bountyId) {
+      return { success: false, error: "Bounty ID required" };
+    }
+    
+    // Create a proposal to reward the referrer
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    // Check if bounty is still active
+    if (bounty.status !== "active") {
+      return { success: false, error: `Bounty is ${bounty.status}, not active` };
+    }
+    
+    // Create a proposal on the party to send reward to referrer
+    const partyContract = new ethers.Contract(
+      bountyId,
+      [
+        "function propose(address[] targets, uint256[] values, bytes[] calldatas, string description) external returns (uint256)"
+      ],
+      wallet
+    );
+    
+    // Prepare proposal to transfer ETH to referrer
+    const targets = [referrerId];
+    const values = [ethers.utils.parseEther(bounty.rewardAmount.toString())];
+    const calldatas = ["0x"]; // Empty calldata for simple ETH transfer
+    const description = `Reward for referring ${referredUser}`;
+    
+    // Submit proposal
+    const tx = await partyContract.propose(
+      targets,
+      values,
+      calldatas,
+      description
+    );
+    
+    console.log("Proposal submitted:", tx.hash);
+    
+    // Wait for transaction to confirm
+    await tx.wait(1);
     
     return { success: true };
   } catch (error) {
@@ -441,7 +574,7 @@ export const recordSuccessfulReferral = async (
 
 export const distributeRewards = async (
   bountyId: string,
-  wallet: any
+  wallet: ethers.Signer
 ): Promise<{ success: boolean, error?: string }> => {
   console.log(`Distributing rewards for bounty ${bountyId}`);
   
@@ -459,13 +592,37 @@ export const distributeRewards = async (
       return { success: false, error: "Bounty must be deployed to blockchain first" };
     }
     
-    // In a real implementation, this would:
-    // 1. Create a governance proposal on the Party
-    // 2. The proposal would distribute funds to referrers
-    // 3. Execute the proposal if enough votes are gathered
+    // Get pending proposals
+    const proposals = await getPartyProposals(wallet.provider, bountyId);
+    const pendingProposals = proposals.filter(p => 
+      p.status === 'active' || p.status === 'ready'
+    );
     
-    // For now, just simulate a delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (pendingProposals.length === 0) {
+      return { success: false, error: "No pending proposals to execute" };
+    }
+    
+    // Execute ready proposals
+    const partyContract = new ethers.Contract(
+      bountyId,
+      [
+        "function execute(uint256 proposalId) external"
+      ],
+      wallet
+    );
+    
+    const readyProposals = pendingProposals.filter(p => p.status === 'ready');
+    
+    if (readyProposals.length === 0) {
+      return { success: false, error: "No proposals ready for execution" };
+    }
+    
+    // Execute each ready proposal
+    for (const proposal of readyProposals) {
+      const tx = await partyContract.execute(proposal.id);
+      console.log(`Executing proposal ${proposal.id}:`, tx.hash);
+      await tx.wait(1);
+    }
     
     return { success: true };
   } catch (error) {
@@ -480,7 +637,7 @@ export const distributeRewards = async (
 export const updateBountyStatus = async (
   bountyId: string,
   newStatus: "active" | "paused" | "expired" | "completed",
-  wallet: any
+  wallet: ethers.Signer
 ): Promise<{ success: boolean, error?: string }> => {
   console.log(`Updating bounty ${bountyId} status to ${newStatus}`);
   
@@ -494,23 +651,38 @@ export const updateBountyStatus = async (
       return { success: false, error: "Bounty not found" };
     }
     
-    // In a real implementation:
-    // 1. If deployed to blockchain, create a governance proposal to update status
-    // 2. Update the metadata on IPFS
-    
-    // For now, update the cache
-    const bountyIndex = bountiesCache.findIndex(b => b.id === bountyId);
-    if (bountyIndex !== -1) {
-      bountiesCache[bountyIndex] = {
-        ...bountiesCache[bountyIndex],
-        status: newStatus
-      };
-    } else {
-      return { success: false, error: "Bounty not found" };
+    if (!bounty.partyAddress) {
+      return { success: false, error: "Bounty must be deployed to blockchain first" };
     }
     
-    // Simulate a delay for blockchain transaction
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Get existing metadata
+    const metadata = await getFromIPFS(
+      bounty.metadataURI?.replace('ipfs://', '') || '',
+      'bounty'
+    );
+    
+    // Update the status in metadata
+    const updatedMetadata = {
+      ...metadata,
+      status: newStatus
+    };
+    
+    // Upload updated metadata to IPFS
+    const newMetadataURI = await uploadToIPFS(updatedMetadata);
+    console.log("Updated metadata uploaded to IPFS:", newMetadataURI);
+    
+    // Update the party's metadata URI
+    const partyContract = new ethers.Contract(
+      bountyId,
+      [
+        "function updatePartyMetadata(string memory newMetadataURI) external"
+      ],
+      wallet
+    );
+    
+    const tx = await partyContract.updatePartyMetadata(newMetadataURI);
+    console.log("Updating party metadata:", tx.hash);
+    await tx.wait(1);
     
     return { success: true };
   } catch (error) {
@@ -525,7 +697,7 @@ export const updateBountyStatus = async (
 export const fundBounty = async (
   bountyId: string,
   additionalFunds: number,
-  wallet: any
+  wallet: ethers.Signer
 ): Promise<{ success: boolean, error?: string }> => {
   console.log(`Adding ${additionalFunds} to bounty ${bountyId}`);
   
@@ -539,26 +711,29 @@ export const fundBounty = async (
       return { success: false, error: "Bounty not found" };
     }
     
-    // Update the cache
-    const bountyIndex = bountiesCache.findIndex(b => b.id === bountyId);
-    if (bountyIndex !== -1) {
-      bountiesCache[bountyIndex] = {
-        ...bountiesCache[bountyIndex],
-        totalBudget: bountiesCache[bountyIndex].totalBudget + additionalFunds,
-        remainingBudget: (bountiesCache[bountyIndex].remainingBudget || 0) + additionalFunds
-      };
-    } else {
-      return { success: false, error: "Bounty not found" };
+    if (!bounty.crowdfundAddress) {
+      return { success: false, error: "Bounty doesn't have an associated crowdfund" };
     }
     
-    // If the bounty is deployed, send a real transaction to the crowdfund
-    if (bounty.crowdfundAddress) {
-      console.log(`Sending ${additionalFunds} to crowdfund at ${bounty.crowdfundAddress}`);
-      // In a real implementation, we would call sentinelContributeToParty here
-    }
+    // Contribute to the crowdfund
+    const crowdfundContract = new ethers.Contract(
+      bounty.crowdfundAddress,
+      [
+        "function contribute() external payable"
+      ],
+      wallet
+    );
     
-    // Simulate a delay for blockchain transaction
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Convert amount to wei
+    const fundAmount = ethers.utils.parseEther(additionalFunds.toString());
+    
+    // Send transaction
+    const tx = await crowdfundContract.contribute({
+      value: fundAmount
+    });
+    
+    console.log(`Contributing ${additionalFunds} ETH to crowdfund:`, tx.hash);
+    await tx.wait(1);
     
     return { success: true };
   } catch (error) {
@@ -568,22 +743,5 @@ export const fundBounty = async (
       error: error instanceof Error ? error.message : "Unknown error funding bounty"
     };
   }
-};
-
-// This function would be added in a real blockchain implementation
-// to fetch on-chain bounty details directly from Party Protocol
-const getBountyPartyDetails = async (
-  provider: ethers.providers.Provider,
-  partyAddress: string
-) => {
-  // Create a contract instance for the Party
-  // const partyContract = new ethers.Contract(partyAddress, PARTY_ABI, provider);
-  // Return party details including metadata URI, etc.
-  
-  // For now, return mock data
-  return {
-    metadataURI: "ipfs://mockHash",
-    // Other party details
-  };
 };
 
