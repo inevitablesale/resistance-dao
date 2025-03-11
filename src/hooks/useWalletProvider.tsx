@@ -1,15 +1,14 @@
-
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { ProposalError } from "@/services/errorHandlingService";
-import { useCallback, useEffect, useRef } from "react";
-
-export type WalletType = 'regular' | 'zerodev' | 'unknown';
+import { detectWalletFeatures, WalletType, WalletCapabilities } from "@/lib/utils";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface WalletProvider {
   provider: ethers.providers.Web3Provider;
   type: WalletType;
+  capabilities: WalletCapabilities;
   isSmartWallet: boolean;
   getNetwork: () => Promise<ethers.providers.Network>;
   getSigner: () => ethers.providers.JsonRpcSigner;
@@ -26,13 +25,18 @@ export const useWalletProvider = () => {
   const initializingRef = useRef<boolean>(false);
   const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasLoggedRef = useRef<boolean>(false);
+  const [walletCapabilities, setWalletCapabilities] = useState<WalletCapabilities | null>(null);
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const getWalletType = (): WalletType => {
-    if (!primaryWallet) return 'unknown';
-    const isZeroDev = primaryWallet.connector?.name?.toLowerCase().includes('zerodev');
-    return isZeroDev ? 'zerodev' : 'regular';
+  const getWalletConnectorInfo = () => {
+    if (!primaryWallet) return null;
+    
+    return {
+      connectorName: primaryWallet.connector?.name || '',
+      address: primaryWallet.address || '',
+      isWalletConnect: primaryWallet.connector?.name?.toLowerCase().includes('walletconnect')
+    };
   };
 
   const getLinkedInUrl = () => {
@@ -212,41 +216,32 @@ export const useWalletProvider = () => {
     try {
       console.log('[Provider] Starting initialization...');
       const walletClient = await validateWalletClient();
-      let currentWalletType = getWalletType();
+      const walletInfo = getWalletConnectorInfo();
       
-      if (currentWalletType === 'zerodev') {
-        console.log('[Provider] Initializing ZeroDev provider...');
-        try {
-          const ethersProvider = await initializeProvider(walletClient);
-          const provider: WalletProvider = {
-            provider: ethersProvider,
-            type: 'zerodev',
-            isSmartWallet: true,
-            getNetwork: () => ethersProvider.getNetwork(),
-            getSigner: () => ethersProvider.getSigner()
-          };
-          providerRef.current = provider;
-          return provider;
-        } catch (error) {
-          console.error('[Provider] ZeroDev initialization failed, falling back to regular wallet');
-          toast({
-            title: "Smart Wallet Unavailable",
-            description: "Falling back to regular wallet mode",
-            variant: "default"
-          });
-          currentWalletType = 'regular';
-        }
-      }
-
-      console.log('[Provider] Initializing regular wallet provider...');
+      // Initialize ethers provider
       const ethersProvider = await initializeProvider(walletClient);
+      
+      // Detect wallet features
+      const { type, capabilities } = await detectWalletFeatures(
+        ethersProvider, 
+        walletInfo
+      );
+      
+      console.log('[Provider] Detected wallet type:', type);
+      console.log('[Provider] Wallet capabilities:', capabilities);
+      
+      // Save wallet capabilities for use elsewhere in the app
+      setWalletCapabilities(capabilities);
+      
       const provider: WalletProvider = {
         provider: ethersProvider,
-        type: currentWalletType,
-        isSmartWallet: false,
+        type: type,
+        capabilities: capabilities,
+        isSmartWallet: capabilities.isContractWallet,
         getNetwork: () => ethersProvider.getNetwork(),
         getSigner: () => ethersProvider.getSigner()
       };
+      
       providerRef.current = provider;
       return provider;
     } catch (error) {
@@ -313,7 +308,8 @@ export const useWalletProvider = () => {
         });
       }
     },
-    getWalletType,
+    getWalletType: () => providerRef.current?.type || 'unknown',
+    getWalletCapabilities: () => walletCapabilities,
     getLinkedInUrl,
     isConnected: !!primaryWallet?.isConnected?.()
   };

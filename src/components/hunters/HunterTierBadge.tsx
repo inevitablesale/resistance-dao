@@ -1,104 +1,59 @@
 
 import React from "react";
-import { HunterTierLevel } from "@/types/content";
-import { Shield, Award, Trophy, Crown } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Award, Star } from "lucide-react";
 
-interface HunterTierBadgeProps {
+export type HunterTierLevel = "bronze" | "silver" | "gold" | "platinum" | "diamond";
+
+export interface HunterTierBadgeProps {
   tier: HunterTierLevel;
-  multiplier: number;
-  progress?: number;
-  compact?: boolean;
   className?: string;
+  multiplier?: number; // Made optional with ?
 }
 
-const tierConfig = {
-  bronze: {
-    color: "text-amber-700",
-    bgColor: "bg-amber-700/10",
-    borderColor: "border-amber-700/20",
-    icon: Shield,
-    label: "Bronze",
-  },
-  silver: {
-    color: "text-slate-400",
-    bgColor: "bg-slate-400/10",
-    borderColor: "border-slate-400/20",
-    icon: Award,
-    label: "Silver",
-  },
-  gold: {
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-500/10",
-    borderColor: "border-yellow-500/20",
-    icon: Trophy,
-    label: "Gold",
-  },
-  platinum: {
-    color: "text-cyan-400",
-    bgColor: "bg-cyan-400/10",
-    borderColor: "border-cyan-400/20",
-    icon: Crown,
-    label: "Platinum",
-  }
-};
+export function HunterTierBadge({ 
+  tier, 
+  className,
+  multiplier = 1 // Default value provided
+}: HunterTierBadgeProps) {
+  const tierConfig = {
+    bronze: {
+      icon: Trophy,
+      color: "bg-amber-700/20 text-amber-700 border-amber-700/40",
+    },
+    silver: {
+      icon: Trophy,
+      color: "bg-slate-400/20 text-slate-400 border-slate-400/40",
+    },
+    gold: {
+      icon: Award,
+      color: "bg-yellow-500/20 text-yellow-500 border-yellow-500/40",
+    },
+    platinum: {
+      icon: Award,
+      color: "bg-blue-400/20 text-blue-400 border-blue-400/40",
+    },
+    diamond: {
+      icon: Star,
+      color: "bg-purple-500/20 text-purple-500 border-purple-500/40",
+    },
+  };
 
-export const HunterTierBadge: React.FC<HunterTierBadgeProps> = ({
-  tier,
-  multiplier,
-  progress,
-  compact = false,
-  className
-}) => {
-  const config = tierConfig[tier];
-  const Icon = config.icon;
-  
-  if (compact) {
-    return (
-      <div 
-        className={cn(
-          "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
-          config.bgColor,
-          config.color,
-          className
-        )}
-      >
-        <Icon className="h-3.5 w-3.5 mr-1" />
-        <span>{config.label}</span>
-      </div>
-    );
-  }
-  
+  const TierIcon = tierConfig[tier].icon;
+
   return (
-    <div className={cn("rounded-lg border p-3", config.borderColor, className)}>
-      <div className="flex items-center mb-2">
-        <Icon className={cn("h-5 w-5 mr-2", config.color)} />
-        <span className={cn("font-medium", config.color)}>{config.label} Hunter</span>
-        <div className="ml-auto bg-black/20 text-white text-xs font-medium px-2 py-0.5 rounded">
-          {multiplier.toFixed(1)}x
-        </div>
-      </div>
-      
-      {typeof progress === 'number' && progress < 100 && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-gray-400">
-            <span>Next tier progress</span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <Progress 
-            value={progress} 
-            className="h-1.5" 
-            indicatorClassName={cn(
-              progress > 66 ? "bg-green-500" :
-              progress > 33 ? "bg-yellow-500" :
-              "bg-red-500"
-            )}
-          />
-        </div>
+    <Badge
+      variant="outline"
+      className={cn(
+        "flex items-center gap-1 py-1 capitalize",
+        tierConfig[tier].color,
+        className
       )}
-    </div>
+    >
+      <TierIcon className="h-3 w-3" />
+      <span>{tier}</span>
+      {multiplier > 1 && <span className="text-xs">×{multiplier}</span>}
+    </Badge>
   );
-};
-
-export default HunterTierBadge;
+}

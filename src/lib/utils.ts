@@ -136,3 +136,131 @@ export async function isContract(provider: ethers.providers.Provider, address: s
     return false;
   }
 }
+
+/**
+ * Detect wallet type based on provider and wallet features
+ * @param provider Ethereum provider
+ * @param walletInfo Additional wallet information
+ * @returns Detected wallet type and capabilities
+ */
+export type WalletType = 
+  | 'regular'           // Standard EOA wallet like MetaMask
+  | 'smart_wallet'      // Smart contract wallet like Safe, ZeroDev
+  | 'hardware_wallet'   // Hardware wallet like Ledger, Trezor
+  | 'multisig'          // Multi-signature wallet
+  | 'social'            // Social login wallet (email, OAuth)
+  | 'mobile'            // Mobile wallet like Rainbow, Trust
+  | 'unknown';          // Unknown wallet type
+
+export interface WalletCapabilities {
+  supportsBatchTransactions: boolean;   // Can execute multiple transactions in one
+  supportsGasless: boolean;             // Supports gasless/sponsored transactions
+  requiresExternalSignature: boolean;   // Requires external device to sign
+  isContractWallet: boolean;            // Is a smart contract wallet
+  supportsEIP1559: boolean;             // Supports EIP-1559 gas model
+  supportsEIP4337: boolean;             // Supports account abstraction
+}
+
+/**
+ * Detect wallet capabilities based on provider and connector information
+ * @param provider Ethereum provider
+ * @param walletInfo Additional wallet information (connector name, etc)
+ * @returns Object with wallet type and capabilities
+ */
+export async function detectWalletFeatures(
+  provider: ethers.providers.Provider,
+  walletInfo?: {
+    connectorName?: string;
+    address?: string;
+    isWalletConnect?: boolean;
+  }
+): Promise<{
+  type: WalletType;
+  capabilities: WalletCapabilities;
+}> {
+  // Default capabilities
+  const capabilities: WalletCapabilities = {
+    supportsBatchTransactions: false,
+    supportsGasless: false,
+    requiresExternalSignature: false,
+    isContractWallet: false,
+    supportsEIP1559: true, // Most modern wallets support this
+    supportsEIP4337: false,
+  };
+
+  // Default type
+  let type: WalletType = 'unknown';
+
+  try {
+    // Check connector name for initial classification
+    const connectorName = walletInfo?.connectorName?.toLowerCase() || '';
+    const address = walletInfo?.address || '';
+    
+    // Smart wallet detection
+    if (connectorName.includes('zerodev') || 
+        connectorName.includes('safe') || 
+        connectorName.includes('ambire')) {
+      type = 'smart_wallet';
+      capabilities.supportsBatchTransactions = true;
+      capabilities.supportsGasless = true;
+      capabilities.isContractWallet = true;
+      capabilities.supportsEIP4337 = connectorName.includes('zerodev');
+    }
+    // Hardware wallet detection
+    else if (connectorName.includes('ledger') || 
+             connectorName.includes('trezor') || 
+             connectorName.includes('lattice')) {
+      type = 'hardware_wallet';
+      capabilities.requiresExternalSignature = true;
+    }
+    // Multisig detection
+    else if (connectorName.includes('gnosis') || 
+             connectorName.includes('multisig')) {
+      type = 'multisig';
+      capabilities.isContractWallet = true;
+      capabilities.supportsBatchTransactions = true;
+    }
+    // Social login detection
+    else if (connectorName.includes('social') || 
+             connectorName.includes('magic') || 
+             connectorName.includes('web3auth')) {
+      type = 'social';
+    }
+    // Mobile wallet detection
+    else if (connectorName.includes('walletconnect') || 
+             walletInfo?.isWalletConnect ||
+             connectorName.includes('rainbow') || 
+             connectorName.includes('trust')) {
+      type = 'mobile';
+    }
+    // Regular EOA wallet (default for MetaMask, etc)
+    else if (connectorName.includes('injected') || 
+             connectorName.includes('metamask') || 
+             connectorName.includes('coinbase')) {
+      type = 'regular';
+    }
+
+    // If we have an address and provider, check if it's a contract
+    if (address && provider) {
+      try {
+        const code = await provider.getCode(address);
+        if (code !== '0x') {
+          capabilities.isContractWallet = true;
+          if (type === 'unknown' || type === 'regular') {
+            type = 'smart_wallet';
+          }
+        }
+      } catch (error) {
+        console.warn('Error checking if address is a contract:', error);
+      }
+    }
+
+    return { type, capabilities };
+  } catch (error) {
+    console.error('Error detecting wallet features:', error);
+    return { 
+      type: 'unknown', 
+      capabilities 
+    };
+  }
+}
