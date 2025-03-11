@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
@@ -24,7 +23,9 @@ const BOUNTIES_DATA = [
     requireVerification: true,
     allowPublicHunters: true,
     maxReferralsPerHunter: 10,
-    bountyType: "nft_referral" as const
+    bountyType: "nft_referral" as const,
+    crowdfundAddress: "0x0987654321098765432109876543210987654321",
+    metadataURI: "ipfs://QmXyz"
   },
   {
     id: "b2",
@@ -42,7 +43,9 @@ const BOUNTIES_DATA = [
     requireVerification: false,
     allowPublicHunters: true,
     maxReferralsPerHunter: 5,
-    bountyType: "token_referral" as const
+    bountyType: "token_referral" as const,
+    crowdfundAddress: null,
+    metadataURI: null
   },
   {
     id: "b3",
@@ -60,7 +63,9 @@ const BOUNTIES_DATA = [
     requireVerification: true,
     allowPublicHunters: false,
     maxReferralsPerHunter: 20,
-    bountyType: "social_media" as const
+    bountyType: "social_media" as const,
+    crowdfundAddress: null,
+    metadataURI: null
   }
 ];
 
@@ -82,8 +87,8 @@ export interface Bounty {
   maxReferralsPerHunter: number;
   bountyType: "nft_referral" | "token_referral" | "social_media";
   remainingBudget?: number;
-  crowdfundAddress?: string | null;
-  metadataURI?: string | null;
+  crowdfundAddress: string | null;
+  metadataURI: string | null;
 }
 
 export interface BountyCreationParams {
@@ -472,3 +477,4 @@ export const fundBounty = async (
     };
   }
 };
+
