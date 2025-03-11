@@ -1,69 +1,86 @@
-# Welcome to your Lovable project
+# Resistance DAO Party Integration
 
-## Project info
+A TypeScript integration of PartyDAO's contracts for the Resistance DAO project. This integration provides hooks and utilities for interacting with PartyDAO's governance and crowdfunding features.
 
-**URL**: https://lovable.dev/projects/20de67db-692b-43bc-8918-dfa81ea94ccd
+## Features
 
-## How can I edit this code?
+- 🏗️ **Party Creation**: Create new DAOs and crowdfunding campaigns
+- 🗳️ **Governance**: Propose, vote, and execute proposals
+- 💰 **Distribution**: Manage token distributions and claims
+- 🔒 **Type-Safe**: Full TypeScript support with contract type definitions
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/20de67db-692b-43bc-8918-dfa81ea94ccd) and start prompting.
+- Node.js 16+
+- npm or yarn
+- An Ethereum wallet (e.g., MetaMask)
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+```bash
+git clone https://github.com/YOUR_USERNAME/resistance-dao-party.git
+cd resistance-dao-party
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Create a `.env` file:
+```bash
+cp .env.example .env
+```
 
-**Use GitHub Codespaces**
+4. Add your environment variables:
+```
+NEXT_PUBLIC_INFURA_ID=your_infura_id
+NEXT_PUBLIC_CHAIN_ID=1
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Usage
 
-## What technologies are used for this project?
+```typescript
+// Example: Creating a new party
+import { usePartyFactory } from './hooks/usePartyFactory';
 
-This project is built with .
+function CreateParty() {
+  const { createParty, loading } = usePartyFactory(FACTORY_ADDRESS);
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+  const handleCreate = async () => {
+    await createParty({
+      hosts: ['0x...'],
+      voteDuration: 7 * 24 * 60 * 60, // 1 week
+      executionDelay: 2 * 24 * 60 * 60, // 2 days
+      passThresholdBps: 5100, // 51%
+      totalVotingPower: ethers.utils.parseEther('100')
+    });
+  };
 
-## How can I deploy this project?
+  return <button onClick={handleCreate}>Create Party</button>;
+}
+```
 
-Simply open [Lovable](https://lovable.dev/projects/20de67db-692b-43bc-8918-dfa81ea94ccd) and click on Share -> Publish.
+## Available Hooks
 
-## I want to use a custom domain - is that possible?
+- `usePartyFactory`: Create new parties and crowdfunds
+- `usePartyProposal`: Manage governance proposals
+- `usePartyDistribution`: Handle token distributions
+- `useWalletConnection`: Wallet connection management
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details

@@ -1,6 +1,6 @@
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Wallet, Loader2, Shield, Gift } from "lucide-react";
+import { Wallet, Loader2, Shield, Gift, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -8,15 +8,34 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useToast } from "@/hooks/use-toast";
 import { NFTPurchaseDialog } from "./wallet/NFTPurchaseDialog";
+import { Input } from "@/components/ui/input";
+import Cookies from 'js-cookie';
+
+// The cookie name for access verification
+const ACCESS_COOKIE_NAME = 'resistance_dao_access';
+// Cookie expiry in days (30 days)
+const COOKIE_EXPIRY = 30;
+// Password for access (in a real app, this would be environment-based or server-verified)
+const ACCESS_PASSWORD = 'resistance2024';
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isPasswordError, setIsPasswordError] = useState(false);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalanceData, isLoading: isCheckingNFT } = useNFTBalance(address);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check for existing access cookie on mount
+    const hasAccess = Cookies.get(ACCESS_COOKIE_NAME);
+    if (hasAccess) {
+      setIsOpen(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (isCheckingNFT) return;
@@ -25,6 +44,28 @@ export const AccessCoverOverlay = () => {
       setShowOptions(true);
     }
   }, [address, nftBalanceData, isCheckingNFT]);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (password === ACCESS_PASSWORD) {
+      // Set cookie for future access
+      Cookies.set(ACCESS_COOKIE_NAME, 'true', { expires: COOKIE_EXPIRY });
+      setIsPasswordError(false);
+      setIsOpen(false);
+      toast({
+        title: "Access Granted",
+        description: "Welcome to Resistance DAO",
+      });
+    } else {
+      setIsPasswordError(true);
+      toast({
+        title: "Access Denied",
+        description: "Invalid password. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleGetNFT = () => {
     setIsPurchaseOpen(true);
@@ -86,83 +127,40 @@ export const AccessCoverOverlay = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-center md:text-left space-y-8 relative"
             >
-              {!address ? (
-                <div className="flex flex-col items-center md:items-start gap-6">
-                  <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                    Welcome to Resistance DAO
-                  </h1>
-                  <p className="text-xl text-blue-200/80 max-w-2xl">
-                    Join 2,500+ members shaping the future
-                  </p>
-                  <div className="flex flex-col items-center md:items-start gap-2 w-full">
-                    <Button 
-                      size="lg"
-                      onClick={connectWallet}
-                      disabled={isInitializing}
-                      className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group w-full md:w-auto"
-                    >
-                      {isInitializing ? (
-                        <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                      ) : (
-                        <Wallet className="w-6 h-6 mr-3" />
-                      )}
-                      Enter
-                    </Button>
-                    <p className="text-sm text-blue-200/60">Early supporters get exclusive rewards and benefits</p>
+              <div className="flex flex-col items-center md:items-start gap-6">
+                <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
+                  Welcome to Resistance DAO
+                </h1>
+                <p className="text-xl text-blue-200/80 max-w-2xl">
+                  Enter the password to access the platform
+                </p>
+                <form onSubmit={handlePasswordSubmit} className="w-full max-w-md space-y-4">
+                  <div className="relative">
+                    <Input
+                      type="password"
+                      placeholder="Enter access password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className={`w-full bg-black/50 border ${
+                        isPasswordError ? 'border-red-500' : 'border-blue-500/20'
+                      } text-white px-4 py-6 rounded-lg focus:border-blue-500 transition-colors`}
+                    />
+                    <Lock className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-400" />
                   </div>
-                </div>
-              ) : showOptions ? (
-                <div className="space-y-6">
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                    Welcome Back!
-                  </h1>
-                  
-                  <div className="bg-black/50 backdrop-blur rounded-xl p-8 border border-blue-500/20 max-w-xl mx-auto md:mx-0">
-                    <h3 className="text-2xl font-bold text-blue-300 mb-4">Member Options</h3>
-                    <div className="space-y-4">
-                      <Button
-                        onClick={handleGiftNFT}
-                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
-                      >
-                        <Gift className="w-6 h-6 mr-3" />
-                        Gift Membership NFT to a Friend
-                      </Button>
-                      <Button
-                        onClick={handleContinueToDapp}
-                        className="w-full bg-gradient-to-r from-blue-400 to-blue-600 py-6 text-lg"
-                      >
-                        <Shield className="w-6 h-6 mr-3" />
-                        Continue to Dapp
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ) : isCheckingNFT ? (
-                <div className="flex flex-col items-center md:items-start gap-4">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
-                  <p className="text-blue-200">Checking membership status...</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                    Membership Required
-                  </h1>
-                  
-                  <div className="bg-black/50 backdrop-blur rounded-xl p-8 border border-blue-500/20 max-w-xl mx-auto md:mx-0">
-                    <h3 className="text-2xl font-bold text-blue-300 mb-4">Member NFT Required</h3>
-                    <p className="text-blue-200/80 mb-6">
-                      You need to own a Resistance DAO Member NFT to access the platform
+                  <Button 
+                    type="submit"
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg"
+                  >
+                    Access Platform
+                  </Button>
+                  {isPasswordError && (
+                    <p className="text-sm text-red-500">
+                      Invalid password. Please try again.
                     </p>
-                    <Button
-                      onClick={handleGetNFT}
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
-                    >
-                      Get Member NFT
-                    </Button>
-                    <p className="text-sm text-blue-200/60 mt-4">Join now to become an OG holder with exclusive benefits</p>
-                  </div>
-                </div>
-              )}
+                  )}
+                </form>
+              </div>
             </motion.div>
           </div>
         </div>

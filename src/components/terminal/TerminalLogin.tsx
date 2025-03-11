@@ -1,9 +1,13 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import Cookies from 'js-cookie';
+
+// Cookie name and expiry
+const ACCESS_COOKIE_NAME = 'resistance_terminal_access';
+const COOKIE_EXPIRY = 30; // 30 days
 
 interface TerminalLoginProps {
   onLoginSuccess: () => void;
@@ -19,6 +23,19 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     "> AWAITING AUTHENTICATION..."
   ]);
   const { connect, isConnected } = useWalletConnection();
+
+  useEffect(() => {
+    // Check for existing access cookie on mount
+    const hasAccess = Cookies.get(ACCESS_COOKIE_NAME);
+    if (hasAccess) {
+      addTerminalMessage("> PREVIOUS ACCESS TOKEN FOUND");
+      addTerminalMessage("> VALIDATING TOKEN...");
+      setTimeout(() => {
+        addTerminalMessage("> ACCESS TOKEN VALIDATED");
+        handleLoginSuccess();
+      }, 1000);
+    }
+  }, []);
 
   useEffect(() => {
     if (isConnected) {
@@ -49,6 +66,8 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     
     if (accessCode === "resistance" || accessCode === "admin") {
       addTerminalMessage("> ACCESS CODE VALIDATED");
+      // Set cookie for future access
+      Cookies.set(ACCESS_COOKIE_NAME, 'true', { expires: COOKIE_EXPIRY });
       handleLoginSuccess();
     } else {
       setIsAuthenticating(false);
@@ -66,6 +85,10 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
   };
 
   const handleLoginSuccess = () => {
+    // Set cookie when logging in with wallet too
+    if (isConnected) {
+      Cookies.set(ACCESS_COOKIE_NAME, 'true', { expires: COOKIE_EXPIRY });
+    }
     onLoginSuccess();
   };
 
