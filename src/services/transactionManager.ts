@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -247,30 +248,59 @@ export const deployHoldingContract = async (
 ): Promise<string> => {
   console.log(`Deploying secure holding contract for ${creatorAddress} and bounty ${bountyId}`);
   
-  const holdingConfig: TransactionConfig['holdingConfig'] = {
-    creatorAddress,
-    bountyId,
-    securityLevel
-  };
-  
-  const deployTransaction = async () => {
-    return await generateHoldingAddress(provider, creatorAddress, bountyId) as unknown as ethers.ContractTransaction;
-  };
-  
-  await executeTransaction(
-    deployTransaction,
-    {
-      type: 'holding_contract_deployment',
-      description: `Deploying secure holding contract for bounty ${bountyId}`,
-      holdingConfig,
-      ...DEFAULT_CONFIG
-    },
-    provider
-  );
-  
-  // Get the address of the deployed contract
-  const holdingAddress = await generateHoldingAddress(provider, creatorAddress, bountyId);
-  console.log(`Holding contract deployed at ${holdingAddress}`);
-  
-  return holdingAddress;
+  try {
+    // First check if there's an existing contract
+    const existingAddress = await generateHoldingAddress(provider, creatorAddress, bountyId);
+    const isExistingContract = await isHoldingContract(provider, existingAddress);
+    
+    if (isExistingContract) {
+      console.log(`Existing holding contract found at ${existingAddress}`);
+      return existingAddress;
+    }
+    
+    // If no existing contract, deploy a new one
+    const holdingConfig: TransactionConfig['holdingConfig'] = {
+      creatorAddress,
+      bountyId,
+      securityLevel
+    };
+    
+    const deployTransaction = async () => {
+      // This will actually deploy the contract via generateHoldingAddress
+      await generateHoldingAddress(provider, creatorAddress, bountyId);
+      // Create a dummy transaction to satisfy the interface
+      return {
+        hash: "0x" + "0".repeat(64),
+        wait: async () => ({ status: 1 })
+      } as unknown as ethers.ContractTransaction;
+    };
+    
+    await executeTransaction(
+      deployTransaction,
+      {
+        type: 'holding_contract_deployment',
+        description: `Deploying secure holding contract for bounty ${bountyId}`,
+        holdingConfig,
+        ...DEFAULT_CONFIG
+      },
+      provider
+    );
+    
+    // Get the address of the deployed contract
+    const holdingAddress = await generateHoldingAddress(provider, creatorAddress, bountyId);
+    console.log(`Holding contract deployed at ${holdingAddress}`);
+    
+    return holdingAddress;
+  } catch (error) {
+    console.error("Error deploying holding contract:", error);
+    throw new ProposalError({
+      category: 'transaction',
+      message: `Failed to deploy holding contract: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      recoverySteps: [
+        'Check your wallet connection',
+        'Make sure you have enough funds for gas',
+        'Try again later'
+      ]
+    });
+  }
 };

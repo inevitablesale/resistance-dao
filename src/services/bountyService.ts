@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
-import { executeTransaction } from "./transactionManager";
-import { toast } from "@/hooks/use-toast";
+import { executeTransaction, verifyPoolTokenTransfer } from "./transactionManager";
 import { uploadToIPFS, getFromIPFS } from "./ipfsService";
 import { BountyMetadata, TokenDistributionConfig } from "@/types/content";
 import { 
@@ -10,6 +9,7 @@ import {
   ETH_CROWDFUND_ABI, 
   PARTY_GOVERNANCE_ABI 
 } from "@/lib/constants";
+import { TokenTransferStatus } from "@/lib/utils";
 
 export interface Bounty {
   id: string;
@@ -87,6 +87,7 @@ export interface BountyCreationParams {
       [key: string]: string | undefined;
     };
   };
+  tokenHoldingAddress?: string;
 }
 
 export interface BountyOptions {
@@ -94,7 +95,6 @@ export interface BountyOptions {
   includeCompleted?: boolean;
 }
 
-// Helper function to calculate remaining budget
 const calculateRemainingBudget = (bounty: Bounty): Bounty => {
   return {
     ...bounty,
@@ -102,9 +102,6 @@ const calculateRemainingBudget = (bounty: Bounty): Bounty => {
   };
 };
 
-/**
- * Maps a Party contract and metadata to a Bounty object
- */
 const mapPartyToBounty = async (
   partyAddress: string, 
   metadata: BountyMetadata, 
@@ -119,7 +116,6 @@ const mapPartyToBounty = async (
       provider
     );
     
-    // Get party details
     const [
       votingEnds,
       governanceValues,
@@ -132,7 +128,6 @@ const mapPartyToBounty = async (
       party.proposalCount ? party.proposalCount() : 0
     ]);
 
-    // Calculate successful proposals (each one is a successful referral)
     let successCount = 0;
     let usedBudget = 0;
     
@@ -141,11 +136,9 @@ const mapPartyToBounty = async (
         const proposalId = await party.proposals(i);
         const status = await party.getProposalStatus(proposalId);
         
-        // Status 3 is EXECUTED in PartyGovernance
         if (status === 3) {
           successCount++;
           
-          // Get proposal details to determine the ETH spent
           const proposal = await party.getProposal(proposalId);
           if (proposal && proposal.proposalData && proposal.proposalData.values) {
             for (const value of proposal.proposalData.values) {
@@ -155,21 +148,18 @@ const mapPartyToBounty = async (
         }
       } catch (error) {
         console.error(`Error processing proposal ${i}:`, error);
-        // Continue to next proposal
+        continue;
       }
     }
     
-    // Get participants count
     const hunterCount = await party.getVotersCount ? 
       await party.getVotersCount() : 0;
     
-    // Get crowdfund address if any
     let crowdfundAddress = null;
     if (metadata.crowdfundAddress && ethers.utils.isAddress(metadata.crowdfundAddress)) {
       crowdfundAddress = metadata.crowdfundAddress;
     }
     
-    // Determine status
     const now = Math.floor(Date.now() / 1000);
     let bountyStatus: "active" | "paused" | "expired" | "completed" | "awaiting_tokens" = "active";
     
@@ -183,7 +173,6 @@ const mapPartyToBounty = async (
       bountyStatus = "paused";
     }
     
-    // Create bounty object
     const bounty: Bounty = {
       id: partyAddress,
       name: metadata.title,
@@ -205,12 +194,10 @@ const mapPartyToBounty = async (
       metadataURI: metadata.metadataURI
     };
     
-    // Include token rewards information if available
     if (metadata.tokenRewards) {
       bounty.tokenRewards = metadata.tokenRewards;
     }
     
-    // Include project info if available
     if (metadata.projectInfo) {
       bounty.projectInfo = metadata.projectInfo;
     }
@@ -222,11 +209,6 @@ const mapPartyToBounty = async (
   }
 };
 
-/**
- * Get bounties from the blockchain by querying the Party Protocol contracts
- * @param status Optional status filter
- * @returns Promise with array of bounties
- */
 export const getBounties = async (status?: string): Promise<Bounty[]> => {
   console.log("Getting bounties with status filter:", status);
   
@@ -235,14 +217,12 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
       "https://polygon-rpc.com"
     );
     
-    // Get party contract factory
     const partyFactory = new ethers.Contract(
       PARTY_PROTOCOL.FACTORY_ADDRESS,
       PARTY_FACTORY_ABI,
       provider
     );
     
-    // Get all parties 
     let partyAddresses;
     try {
       partyAddresses = await partyFactory.getParties();
@@ -251,36 +231,30 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
       partyAddresses = [];
     }
     
-    // Fetch all bounties in parallel
     const bountyPromises = partyAddresses.map(async (partyAddress: string) => {
       try {
-        // Get party contract
         const party = new ethers.Contract(
           partyAddress,
           PARTY_GOVERNANCE_ABI,
           provider
         );
         
-        // Check if this party has a metadataURI and if it's a bounty
         let metadataURI;
         try {
           metadataURI = await party.metadataURI();
         } catch (error) {
-          return null; // Not a party with metadata, skip
+          return null;
         }
         
         if (!metadataURI) return null;
         
-        // Fetch and parse metadata
         const metadata = await getFromIPFS<BountyMetadata>(
           metadataURI.replace('ipfs://', ''),
           'bounty'
         );
         
-        // Skip if not a bounty type
         if (!metadata.bountyType) return null;
         
-        // Map party to bounty
         return await mapPartyToBounty(partyAddress, metadata, provider);
       } catch (error) {
         console.error(`Error processing party ${partyAddress}:`, error);
@@ -288,10 +262,8 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
       }
     });
     
-    // Wait for all bounties to be processed
     const allBounties = await Promise.all(bountyPromises);
     
-    // Filter out null results and apply status filter if provided
     const validBounties = allBounties.filter(bounty => 
       bounty !== null && 
       (!status || bounty.status === status)
@@ -312,33 +284,29 @@ export const getBounty = async (bountyId: string): Promise<Bounty | null> => {
       "https://polygon-rpc.com"
     );
     
-    // Get party contract
     const party = new ethers.Contract(
       bountyId,
       PARTY_GOVERNANCE_ABI,
       provider
     );
     
-    // Get metadata URI
     let metadataURI;
     try {
       metadataURI = await party.metadataURI();
     } catch (error) {
       console.error("Error fetching metadata URI:", error);
-      return null; // Not a party with metadata
+      return null;
     }
     
     if (!metadataURI) {
       throw new Error("Invalid bounty: no metadata URI");
     }
     
-    // Fetch and parse metadata
     const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
     
-    // Map party to bounty
     return await mapPartyToBounty(bountyId, metadata, provider);
   } catch (error) {
     console.error("Error fetching bounty details:", error);
@@ -357,13 +325,11 @@ export const createBounty = async (
   }
   
   try {
-    // For token distribution bounties, we'll use the holding address pattern
     let holdingAddress = null;
     if (params.bountyType === "token_distribution" && params.tokenRewards) {
       const provider = wallet.provider;
       const creatorAddress = await wallet.getAddress();
       
-      // Generate a unique holding address for this bounty
       holdingAddress = await generateHoldingAddress(
         provider,
         creatorAddress,
@@ -373,14 +339,12 @@ export const createBounty = async (
       console.log("Generated holding address for token distribution:", holdingAddress);
     }
     
-    // Deploy the bounty to blockchain using Party Protocol
     const { partyAddress, crowdfundAddress, metadataURI } = await deployBountyToBlockchain(
       params,
       wallet,
       holdingAddress
     );
     
-    // Create the bounty object
     const newBounty: Bounty = {
       id: partyAddress,
       name: params.name,
@@ -404,12 +368,10 @@ export const createBounty = async (
       holdingAddress
     };
     
-    // Add token rewards if provided
     if (params.tokenRewards) {
       newBounty.tokenRewards = params.tokenRewards;
     }
     
-    // Add project info if provided
     if (params.projectInfo) {
       newBounty.projectInfo = params.projectInfo;
     }
@@ -440,7 +402,6 @@ export const deployBountyToBlockchain = async (
     const userAddress = await wallet.getAddress();
     console.log("Using wallet for deployment:", userAddress);
     
-    // Upload bounty metadata to IPFS
     const now = Math.floor(Date.now() / 1000);
     const bountyMetadata: BountyMetadata = {
       contentSchema: "resistanceBounty-v1",
@@ -464,7 +425,6 @@ export const deployBountyToBlockchain = async (
       expiresAt: now + (60 * 60 * 24 * bountyParams.duration)
     };
     
-    // Add token rewards information if available
     if (bountyParams.tokenRewards) {
       bountyMetadata.tokenRewards = {
         ...bountyParams.tokenRewards,
@@ -472,13 +432,14 @@ export const deployBountyToBlockchain = async (
       };
     }
     
-    // Add holding address for token distribution bounties
-    if (holdingAddress && bountyParams.bountyType === "token_distribution") {
-      bountyMetadata.holdingAddress = holdingAddress;
+    const finalHoldingAddress = holdingAddress || bountyParams.tokenHoldingAddress;
+    
+    if (finalHoldingAddress && bountyParams.bountyType === "token_distribution") {
+      bountyMetadata.holdingAddress = finalHoldingAddress;
       bountyMetadata.tokenTransferStatus = "awaiting_tokens";
+      bountyMetadata.status = "awaiting_tokens";
     }
     
-    // Add project info if available
     if (bountyParams.projectInfo) {
       bountyMetadata.projectInfo = bountyParams.projectInfo;
     }
@@ -486,25 +447,23 @@ export const deployBountyToBlockchain = async (
     const metadataURI = await uploadToIPFS(bountyMetadata);
     console.log("Bounty metadata uploaded to IPFS:", metadataURI);
     
-    // Create Party Factory contract instance
     const partyFactory = new ethers.Contract(
       PARTY_PROTOCOL.FACTORY_ADDRESS,
       PARTY_FACTORY_ABI,
       wallet
     );
     
-    // Set up party options
     const partyOptions = {
       name: `Bounty: ${bountyParams.name}`,
       symbol: "BNTY",
-      customizationPresetId: 0, // Default preset
+      customizationPresetId: 0,
       governance: {
         hosts: [userAddress],
-        voteDuration: 60 * 60 * 24 * 3, // 3 days
-        executionDelay: 60 * 60 * 24, // 1 day
-        passThresholdBps: 5000, // 50%
+        voteDuration: 60 * 60 * 24 * 3,
+        executionDelay: 60 * 60 * 24,
+        passThresholdBps: 5000,
         totalVotingPower: ethers.utils.parseEther(bountyParams.totalBudget.toString()),
-        feeBps: 0, // No fees
+        feeBps: 0,
         feeRecipient: ethers.constants.AddressZero
       },
       proposalEngine: {
@@ -514,30 +473,24 @@ export const deployBountyToBlockchain = async (
       }
     };
     
-    // Create empty arrays for precious tokens (not needed for bounties)
     const preciousTokens: string[] = [];
     const preciousTokenIds: number[] = [];
     
-    // Deploy the party contract
     console.log("Creating bounty party...");
     const tx = await partyFactory.createPartyWithMetadata(
-      PARTY_PROTOCOL.PARTY_IMPLEMENTATION, // Party implementation
-      [userAddress], // Authorities (only creator)
+      PARTY_PROTOCOL.PARTY_IMPLEMENTATION,
+      [userAddress],
       partyOptions,
       preciousTokens,
       preciousTokenIds,
-      0, // No ragequit
-      ethers.constants.AddressZero, // Default metadata provider
-      ethers.utils.defaultAbiCoder.encode(
-        ["string"],
-        [metadataURI]
-      )
+      0,
+      ethers.constants.AddressZero,
+      ethers.utils.defaultAbiCoder.encode(["string"], [metadataURI])
     );
     
     console.log("Bounty party creation transaction sent:", tx.hash);
     const receipt = await tx.wait();
     
-    // Extract party address from event logs
     let partyAddress = null;
     for (const log of receipt.logs) {
       try {
@@ -547,7 +500,6 @@ export const deployBountyToBlockchain = async (
           break;
         }
       } catch (error) {
-        // Not the event we're looking for
         continue;
       }
     }
@@ -558,7 +510,6 @@ export const deployBountyToBlockchain = async (
     
     console.log(`Bounty party created at address: ${partyAddress}`);
     
-    // Create a crowdfund for the party
     console.log("Creating ETH crowdfund for bounty...");
     
     const crowdfundFactory = new ethers.Contract(
@@ -569,14 +520,14 @@ export const deployBountyToBlockchain = async (
     
     const crowdfundOptions = {
       initialContributor: userAddress,
-      minContribution: ethers.utils.parseEther("0.01"), // Small minimum
+      minContribution: ethers.utils.parseEther("0.01"),
       maxContribution: ethers.utils.parseEther(bountyParams.totalBudget.toString()),
       maxTotalContributions: ethers.utils.parseEther((bountyParams.totalBudget * 2).toString()),
       duration: (60 * 60 * 24 * bountyParams.duration),
-      exchangeRate: 1, // 1:1 ETH to voting power
-      fundingSplitBps: 0, // No funding split
+      exchangeRate: 1,
+      fundingSplitBps: 0,
       fundingSplitRecipient: ethers.constants.AddressZero,
-      gateKeeper: ethers.constants.AddressZero, // No gatekeeper
+      gateKeeper: ethers.constants.AddressZero,
       gateKeeperId: ethers.constants.HashZero
     };
     
@@ -589,7 +540,6 @@ export const deployBountyToBlockchain = async (
     console.log("Crowdfund creation transaction sent:", crowdfundTx.hash);
     const crowdfundReceipt = await crowdfundTx.wait();
     
-    // Extract crowdfund address from event logs
     let crowdfundAddress = null;
     for (const log of crowdfundReceipt.logs) {
       try {
@@ -599,7 +549,6 @@ export const deployBountyToBlockchain = async (
           break;
         }
       } catch (error) {
-        // Not the event we're looking for
         continue;
       }
     }
@@ -610,7 +559,6 @@ export const deployBountyToBlockchain = async (
     
     console.log(`Bounty crowdfund created at address: ${crowdfundAddress}`);
     
-    // Contribute initial funds to the crowdfund
     console.log(`Contributing ${bountyParams.totalBudget} ETH to the crowdfund...`);
     
     const crowdfund = new ethers.Contract(
@@ -620,14 +568,13 @@ export const deployBountyToBlockchain = async (
     );
     
     const contributeTx = await crowdfund.contribute(
-      userAddress, // self-delegation
+      userAddress,
       { value: ethers.utils.parseEther(bountyParams.totalBudget.toString()) }
     );
     
     console.log("Contribution transaction sent:", contributeTx.hash);
     await contributeTx.wait();
     
-    // Update the party metadata to include the crowdfund address
     const updatedMetadata: BountyMetadata = {
       ...bountyMetadata,
       crowdfundAddress
@@ -635,7 +582,6 @@ export const deployBountyToBlockchain = async (
     
     const updatedMetadataURI = await uploadToIPFS(updatedMetadata);
     
-    // Return the deployed addresses
     return {
       partyAddress,
       crowdfundAddress,
@@ -677,56 +623,47 @@ export const recordSuccessfulReferral = async (
       return { success: false, error: "Valid Bounty ID required" };
     }
     
-    // Get bounty details
     const bounty = await getBounty(bountyId);
     if (!bounty) {
       return { success: false, error: "Bounty not found" };
     }
     
-    // Check if bounty is still active
     if (bounty.status !== "active") {
       return { success: false, error: `Bounty is ${bounty.status}, not active` };
     }
     
-    // Get current metadata from IPFS
     const metadataURI = bounty.metadataURI;
     
     if (!metadataURI) {
       return { success: false, error: "Bounty has no metadata URI" };
     }
     
-    // Get metadata
     const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
     
-    // Calculate reward amount with performance multiplier if enabled
     let rewardAmount = bounty.rewardAmount;
     let multiplier = 1.0;
     
     if (metadata.hunterTiers?.enabled && metadata.hunterPerformance) {
-      // Import function to calculate reward multiplier
       const { calculateRewardMultiplier } = await import('./hunterPerformanceService');
       multiplier = calculateRewardMultiplier(metadata, referrerId);
       rewardAmount = rewardAmount * multiplier;
     }
     
-    // Create party contract instance
     const party = new ethers.Contract(
       bountyId,
       PARTY_GOVERNANCE_ABI,
       wallet
     );
     
-    // Prepare proposal to transfer ETH to referrer
     const targets = [referrerId];
     const values = [ethers.utils.parseEther(rewardAmount.toString())];
-    const calldatas = ["0x"]; // Empty calldata for simple ETH transfer
+    const calldatas = ["0x"];
     
-    // Create proposal data structure
     const proposalData = {
-      basicProposalEngineType: 0, // Standard proposal type
+      basicProposalEngineType: 0,
       targetAddresses: targets,
       values: values,
       calldatas: calldatas,
@@ -735,34 +672,29 @@ export const recordSuccessfulReferral = async (
     
     const description = `Reward for referring ${referredUser} (Multiplier: ${multiplier.toFixed(2)})`;
     
-    // Submit proposal
     console.log("Submitting referral reward proposal...");
     const tx = await party.propose(
       proposalData,
       description,
-      "0x" // No progress data
+      "0x"
     );
     
     console.log("Proposal submitted:", tx.hash);
     
-    // Wait for transaction to confirm
     await tx.wait(1);
     
-    // Update hunter performance with this successful referral
     const { updateHunterPerformance } = await import('./hunterPerformanceService');
     const updatedMetadata = updateHunterPerformance(
       metadata,
       referrerId,
-      true, // successful
-      undefined, // We don't track completion time yet
+      true,
+      undefined,
       rewardAmount
     );
     
-    // Upload updated metadata to IPFS
     const newMetadataURI = await uploadToIPFS(updatedMetadata);
     console.log("Updated metadata uploaded to IPFS:", newMetadataURI);
     
-    // Update the party's metadata URI
     await party.updateMetadataURI(newMetadataURI);
     
     return { success: true };
@@ -790,30 +722,26 @@ export const distributeRewards = async (
       return { success: false, error: "Valid Bounty ID required" };
     }
     
-    // Get party contract instance
     const party = new ethers.Contract(
       bountyId,
       PARTY_GOVERNANCE_ABI,
       wallet
     );
     
-    // Get total proposal count
     const proposalCount = await party.proposalCount();
     
-    // Find ready proposals
     const readyProposalIds = [];
     for (let i = 0; i < proposalCount; i++) {
       try {
         const proposalId = await party.proposals(i);
         const status = await party.getProposalStatus(proposalId);
         
-        // Status 2 is READY in PartyGovernance
         if (status === 2) {
           readyProposalIds.push(proposalId);
         }
       } catch (error) {
         console.error(`Error checking proposal ${i}:`, error);
-        // Continue to next proposal
+        continue;
       }
     }
     
@@ -821,15 +749,12 @@ export const distributeRewards = async (
       return { success: false, error: "No proposals ready for execution" };
     }
     
-    // Execute each ready proposal
     for (const proposalId of readyProposalIds) {
       try {
         console.log(`Executing proposal ${proposalId}...`);
         
-        // Get proposal details
         const proposal = await party.getProposal(proposalId);
         
-        // Prepare execution data
         const executionData = {
           targets: proposal.proposalData.targetAddresses,
           values: proposal.proposalData.values,
@@ -837,19 +762,18 @@ export const distributeRewards = async (
           signatures: proposal.proposalData.signatures || [""]
         };
         
-        // Execute the proposal
         const tx = await party.execute(
           proposalId,
           executionData,
-          0, // No flags
-          "0x" // No progress data
+          0,
+          "0x"
         );
         
         console.log(`Executing proposal ${proposalId}:`, tx.hash);
         await tx.wait(1);
       } catch (error) {
         console.error(`Error executing proposal ${proposalId}:`, error);
-        // Continue with other proposals
+        continue;
       }
     }
     
@@ -879,37 +803,31 @@ export const updateBountyStatus = async (
       return { success: false, error: "Valid Bounty ID required" };
     }
     
-    // Get party contract instance
     const party = new ethers.Contract(
       bountyId,
       PARTY_GOVERNANCE_ABI,
       wallet
     );
     
-    // Get current metadata URI
     const metadataURI = await party.metadataURI();
     
     if (!metadataURI) {
       return { success: false, error: "Bounty has no metadata URI" };
     }
     
-    // Get existing metadata
     const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
     
-    // Update the status in metadata
     const updatedMetadata: BountyMetadata = {
       ...metadata,
       status: newStatus
     };
     
-    // Upload updated metadata to IPFS
     const newMetadataURI = await uploadToIPFS(updatedMetadata);
     console.log("Updated metadata uploaded to IPFS:", newMetadataURI);
     
-    // Update the party's metadata URI
     const tx = await party.updateMetadataURI(newMetadataURI);
     console.log("Updating party metadata:", tx.hash);
     await tx.wait(1);
@@ -940,13 +858,11 @@ export const fundBounty = async (
       return { success: false, error: "Valid Bounty ID required" };
     }
     
-    // Get bounty details
     const bounty = await getBounty(bountyId);
     if (!bounty) {
       return { success: false, error: "Bounty not found" };
     }
     
-    // Transfer ETH directly to the party contract
     const tx = await wallet.sendTransaction({
       to: bountyId,
       value: ethers.utils.parseEther(additionalFunds.toString())
@@ -955,32 +871,26 @@ export const fundBounty = async (
     console.log(`Contributing ${additionalFunds} ETH to bounty:`, tx.hash);
     await tx.wait(1);
     
-    // Update the bounty metadata to reflect new total budget
     const party = new ethers.Contract(
       bountyId,
       PARTY_GOVERNANCE_ABI,
       wallet
     );
     
-    // Get current metadata URI
     const metadataURI = await party.metadataURI();
     
-    // Get existing metadata
     const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
     
-    // Update the total budget in metadata
     const updatedMetadata = {
       ...metadata,
       totalBudget: (metadata.totalBudget || 0) + additionalFunds
     };
     
-    // Upload updated metadata to IPFS
     const newMetadataURI = await uploadToIPFS(updatedMetadata);
     
-    // Update the party's metadata URI
     const updateTx = await party.updateMetadataURI(newMetadataURI);
     console.log("Updating party metadata with new budget:", updateTx.hash);
     await updateTx.wait(1);
@@ -1012,38 +922,32 @@ export const updateBountyHunterTiers = async (
       return { success: false, error: "Valid Bounty ID required" };
     }
     
-    // Get party contract instance
     const party = new ethers.Contract(
       bountyId,
       PARTY_GOVERNANCE_ABI,
       wallet
     );
     
-    // Get current metadata URI
     const metadataURI = await party.metadataURI();
     
     if (!metadataURI) {
       return { success: false, error: "Bounty has no metadata URI" };
     }
     
-    // Get existing metadata
     const metadata = await getFromIPFS<BountyMetadata>(
       metadataURI.replace('ipfs://', ''),
       'bounty'
     );
     
-    // Update the hunter tiers in metadata
     const updatedMetadata: BountyMetadata = {
       ...metadata,
       hunterTiers,
       performanceMultipliers
     };
     
-    // Upload updated metadata to IPFS
     const newMetadataURI = await uploadToIPFS(updatedMetadata);
     console.log("Updated metadata uploaded to IPFS:", newMetadataURI);
     
-    // Update the party's metadata URI
     const tx = await party.updateMetadataURI(newMetadataURI);
     console.log("Updating party metadata:", tx.hash);
     await tx.wait(1);
@@ -1067,13 +971,11 @@ export const getHunterPerformance = async (
       throw new Error("Valid Bounty ID required");
     }
     
-    // Get bounty details
     const bounty = await getBounty(bountyId);
     if (!bounty) {
       throw new Error("Bounty not found");
     }
     
-    // Get metadata from IPFS
     const metadataURI = bounty.metadataURI;
     
     if (!metadataURI) {
@@ -1092,7 +994,6 @@ export const getHunterPerformance = async (
       };
     }
     
-    // Import helper function
     const { getHunterTierInfo } = await import('./hunterPerformanceService');
     const tierInfo = getHunterTierInfo(metadata, hunterAddress);
     
@@ -1118,13 +1019,11 @@ export const verifyBountyTokenTransfer = async (
   try {
     console.log(`Verifying token transfer for bounty ${bountyId}`);
     
-    // Get bounty details
     const bounty = await getBounty(bountyId);
     if (!bounty) {
       throw new Error("Bounty not found");
     }
     
-    // Check if this is a token distribution bounty with a holding address
     if (
       bounty.bountyType !== "token_distribution" || 
       !bounty.holdingAddress || 
@@ -1133,7 +1032,6 @@ export const verifyBountyTokenTransfer = async (
       throw new Error("This bounty doesn't use the token holding pattern");
     }
     
-    // Get the verification result
     const result = await verifyPoolTokenTransfer(
       provider,
       {
@@ -1146,7 +1044,6 @@ export const verifyBountyTokenTransfer = async (
       }
     );
     
-    // Update the bounty metadata with the verification status
     if (bounty.metadataURI) {
       const metadata = await getFromIPFS<BountyMetadata>(
         bounty.metadataURI.replace('ipfs://', ''),
@@ -1158,23 +1055,23 @@ export const verifyBountyTokenTransfer = async (
         tokenTransferStatus: result.status
       };
       
-      // If the tokens have been transferred, update the bounty status
       if (result.status === "completed") {
         updatedMetadata.status = "active";
       }
       
-      // Upload updated metadata
       const newMetadataURI = await uploadToIPFS(updatedMetadata);
       
-      // Update the party contract metadata
-      const party = new ethers.Contract(
-        bountyId,
-        ["function updateMetadataURI(string) external"],
-        provider.getSigner()
-      );
-      
-      const tx = await party.updateMetadataURI(newMetadataURI);
-      await tx.wait();
+      if (provider.getSigner) {
+        const signer = provider.getSigner();
+        const party = new ethers.Contract(
+          bountyId,
+          PARTY_GOVERNANCE_ABI,
+          signer
+        );
+        
+        const tx = await party.updateMetadataURI(newMetadataURI);
+        await tx.wait();
+      }
     }
     
     return result;

@@ -1,356 +1,96 @@
 
 import { ethers } from "ethers";
+import { ProposalError } from "./errorHandlingService";
 import { TokenTransferStatus } from "@/lib/utils";
+import { HOLDING_FACTORY_ADDRESSES, HOLDING_FACTORY_ABI, SECURITY_LEVELS } from "@/lib/constants/contracts";
 
-export const checkTokenAllowance = async (
-  provider: ethers.providers.Web3Provider,
-  tokenAddress: string,
-  owner: string,
-  spender: string,
-  requiredAmount: string
-) => {
-  try {
-    const tokenContract = new ethers.Contract(
-      tokenAddress,
-      ["function allowance(address,address) view returns (uint256)"],
-      provider
-    );
+// ERC20 Interface
+const ERC20_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)",
+  "function transfer(address to, uint amount) returns (bool)",
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function approve(address spender, uint256 amount) returns (bool)"
+];
 
-    const requiredAmountWei = requiredAmount.includes('.')
-      ? ethers.utils.parseUnits(requiredAmount, 18)
-      : ethers.BigNumber.from(requiredAmount);
+// ERC721 Interface
+const ERC721_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
+  "function isApprovedForAll(address owner, address operator) view returns (bool)",
+  "function setApprovalForAll(address operator, bool approved)",
+  "function safeTransferFrom(address from, address to, uint256 tokenId)",
+  "function transferFrom(address from, address to, uint256 tokenId)"
+];
 
-    console.log("Checking allowance for:", {
-      tokenAddress,
-      owner,
-      spender,
-      requiredAmount,
-      requiredAmountWei: requiredAmountWei.toString()
-    });
+// ERC1155 Interface
+const ERC1155_ABI = [
+  "function balanceOf(address account, uint256 id) view returns (uint256)",
+  "function balanceOfBatch(address[] calldata accounts, uint256[] calldata ids) view returns (uint256[] memory)",
+  "function isApprovedForAll(address account, address operator) view returns (bool)",
+  "function setApprovalForAll(address operator, bool approved)",
+  "function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes calldata data)"
+];
 
-    const currentAllowance = await tokenContract.allowance(owner, spender);
-    const hasEnough = currentAllowance.gte(requiredAmountWei);
-
-    console.log("Allowance check:", {
-      currentAllowance: ethers.utils.formatUnits(currentAllowance, 18),
-      requiredAmount,
-      hasEnough
-    });
-
-    return hasEnough;
-  } catch (error) {
-    console.error("Error checking allowance:", error);
-    throw error;
-  }
-};
-
-export const approveExactAmount = async (
-  provider: ethers.providers.Web3Provider,
-  tokenAddress: string,
-  spenderAddress: string,
-  amount: string
-) => {
-  const signer = provider.getSigner();
-  const tokenContract = new ethers.Contract(
-    tokenAddress,
-    ["function approve(address,uint256) returns (bool)"],
-    signer
-  );
-
-  const amountWei = amount.includes('.')
-    ? ethers.utils.parseUnits(amount, 18)
-    : ethers.BigNumber.from(amount);
-
-  console.log("Approving exact amount:", {
-    token: tokenAddress,
-    spender: spenderAddress,
-    amount,
-    amountWei: amountWei.toString()
-  });
-
-  try {
-    const tx = await tokenContract.approve(spenderAddress, amountWei);
-    await tx.wait();
-    return tx;
-  } catch (error) {
-    console.error("Error approving token:", error);
-    throw error;
-  }
-};
-
-export const getTokenBalance = async (
-  provider: ethers.providers.Web3Provider,
-  tokenAddress: string,
-  accountAddress: string
-): Promise<string> => {
-  try {
-    const tokenContract = new ethers.Contract(
-      tokenAddress,
-      ["function balanceOf(address) view returns (uint256)"],
-      provider
-    );
-
-    const balance = await tokenContract.balanceOf(accountAddress);
-    return ethers.utils.formatUnits(balance, 18);
-  } catch (error) {
-    console.error("Error getting token balance:", error);
-    throw error;
-  }
-};
+// Holding Contract ABI
+const HOLDING_CONTRACT_ABI = [
+  "function withdraw(address token, address recipient, uint256 amount) external",
+  "function withdrawERC721(address token, address recipient, uint256 tokenId) external",
+  "function withdrawERC1155(address token, address recipient, uint256 tokenId, uint256 amount) external",
+  "function emergencyWithdraw(address token, address recipient) external",
+  "function getCreator() external view returns (address)",
+  "function getBountyId() external view returns (string)",
+  "function getSecurityLevel() external view returns (uint8)"
+];
 
 /**
- * Verifies if the required tokens have been transferred to a specific address
+ * Checks if an address is a valid holding contract for bounties
  * @param provider Ethereum provider
- * @param tokenConfig Configuration of the tokens to verify
- * @param destinationAddress Address where tokens should be transferred
- * @returns Object with verification status and details
+ * @param contractAddress Address to check
+ * @returns Promise resolving to boolean indicating if it's a holding contract
  */
-export const verifyTokenTransfer = async (
+export const isHoldingContract = async (
   provider: ethers.providers.Provider,
-  tokenConfig: {
-    tokenAddress: string;
-    tokenType: "erc20" | "erc721" | "erc1155";
-    tokenIds?: string[];
-    amount?: number;
-  },
-  destinationAddress: string
-): Promise<{
-  status: TokenTransferStatus;
-  currentAmount: string;
-  targetAmount: string;
-  missingTokens?: string[];
-}> => {
+  contractAddress: string
+): Promise<boolean> => {
   try {
-    console.log("Verifying token transfer:", {
-      tokenConfig,
-      destinationAddress
-    });
+    // First, verify it's a contract
+    const code = await provider.getCode(contractAddress);
+    if (code === '0x') return false;
     
-    if (tokenConfig.tokenType === "erc20") {
-      return await verifyERC20Transfer(
-        provider,
-        tokenConfig.tokenAddress,
-        destinationAddress,
-        tokenConfig.amount?.toString() || "0"
-      );
-    } else if (tokenConfig.tokenType === "erc721" && tokenConfig.tokenIds) {
-      return await verifyERC721Transfer(
-        provider,
-        tokenConfig.tokenAddress,
-        destinationAddress,
-        tokenConfig.tokenIds
-      );
-    } else if (tokenConfig.tokenType === "erc1155" && tokenConfig.tokenIds) {
-      return await verifyERC1155Transfer(
-        provider,
-        tokenConfig.tokenAddress,
-        destinationAddress,
-        tokenConfig.tokenIds,
-        tokenConfig.amount || 1
-      );
+    // Get the current network
+    const network = await provider.getNetwork();
+    const factoryAddress = HOLDING_FACTORY_ADDRESSES[network.chainId];
+    
+    if (!factoryAddress || factoryAddress === ethers.constants.AddressZero) {
+      console.warn(`No holding factory deployed on network ${network.chainId}, falling back to basic check`);
+      
+      // Fallback to checking for the minimal interface
+      try {
+        const contract = new ethers.Contract(contractAddress, ["function getCreator() view returns (address)"], provider);
+        await contract.getCreator();
+        return true;
+      } catch (error) {
+        return false;
+      }
     }
     
-    return {
-      status: "failed",
-      currentAmount: "0",
-      targetAmount: "0",
-      missingTokens: []
-    };
+    // Use the factory to check if this is a deployed holding contract
+    const factory = new ethers.Contract(factoryAddress, HOLDING_FACTORY_ABI, provider);
+    return await factory.isHoldingContract(contractAddress);
   } catch (error) {
-    console.error("Error verifying token transfer:", error);
-    return {
-      status: "failed",
-      currentAmount: "0",
-      targetAmount: "0",
-      missingTokens: []
-    };
+    console.error("Error checking holding contract:", error);
+    return false;
   }
-};
-
-/**
- * Verifies ERC20 token transfer
- */
-const verifyERC20Transfer = async (
-  provider: ethers.providers.Provider,
-  tokenAddress: string,
-  destinationAddress: string,
-  targetAmount: string
-): Promise<{
-  status: TokenTransferStatus;
-  currentAmount: string;
-  targetAmount: string;
-}> => {
-  const tokenContract = new ethers.Contract(
-    tokenAddress,
-    ["function balanceOf(address) view returns (uint256)"],
-    provider
-  );
-  
-  const targetAmountWei = targetAmount.includes('.')
-    ? ethers.utils.parseUnits(targetAmount, 18)
-    : ethers.BigNumber.from(targetAmount);
-  
-  const balance = await tokenContract.balanceOf(destinationAddress);
-  const currentAmountFormatted = ethers.utils.formatUnits(balance, 18);
-  const targetAmountFormatted = ethers.utils.formatUnits(targetAmountWei, 18);
-  
-  console.log("ERC20 verification result:", {
-    tokenAddress,
-    destinationAddress,
-    currentBalance: currentAmountFormatted,
-    targetAmount: targetAmountFormatted
-  });
-  
-  let status: TokenTransferStatus = "awaiting_tokens";
-  
-  if (balance.gte(targetAmountWei)) {
-    status = "completed";
-  } else if (balance.gt(0)) {
-    status = "verifying";
-  }
-  
-  return {
-    status,
-    currentAmount: currentAmountFormatted,
-    targetAmount: targetAmountFormatted
-  };
-};
-
-/**
- * Verifies ERC721 token transfer (NFTs)
- */
-const verifyERC721Transfer = async (
-  provider: ethers.providers.Provider,
-  tokenAddress: string,
-  destinationAddress: string,
-  tokenIds: string[]
-): Promise<{
-  status: TokenTransferStatus;
-  currentAmount: string;
-  targetAmount: string;
-  missingTokens: string[];
-}> => {
-  const tokenContract = new ethers.Contract(
-    tokenAddress,
-    [
-      "function balanceOf(address) view returns (uint256)",
-      "function ownerOf(uint256) view returns (address)"
-    ],
-    provider
-  );
-  
-  const verificationResults = await Promise.all(
-    tokenIds.map(async (tokenId) => {
-      try {
-        const owner = await tokenContract.ownerOf(tokenId);
-        return {
-          tokenId,
-          owned: owner.toLowerCase() === destinationAddress.toLowerCase()
-        };
-      } catch (error) {
-        return { tokenId, owned: false };
-      }
-    })
-  );
-  
-  const ownedTokens = verificationResults.filter(r => r.owned);
-  const missingTokens = verificationResults.filter(r => !r.owned).map(r => r.tokenId);
-  
-  console.log("ERC721 verification result:", {
-    tokenAddress,
-    destinationAddress,
-    ownedCount: ownedTokens.length,
-    totalCount: tokenIds.length,
-    missingTokens
-  });
-  
-  let status: TokenTransferStatus = "awaiting_tokens";
-  
-  if (ownedTokens.length === tokenIds.length) {
-    status = "completed";
-  } else if (ownedTokens.length > 0) {
-    status = "verifying";
-  }
-  
-  return {
-    status,
-    currentAmount: ownedTokens.length.toString(),
-    targetAmount: tokenIds.length.toString(),
-    missingTokens
-  };
-};
-
-/**
- * Verifies ERC1155 token transfer (multi-token NFTs)
- */
-const verifyERC1155Transfer = async (
-  provider: ethers.providers.Provider,
-  tokenAddress: string,
-  destinationAddress: string,
-  tokenIds: string[],
-  amount: number
-): Promise<{
-  status: TokenTransferStatus;
-  currentAmount: string;
-  targetAmount: string;
-  missingTokens: string[];
-}> => {
-  const tokenContract = new ethers.Contract(
-    tokenAddress,
-    [
-      "function balanceOf(address, uint256) view returns (uint256)"
-    ],
-    provider
-  );
-  
-  const verificationResults = await Promise.all(
-    tokenIds.map(async (tokenId) => {
-      try {
-        const balance = await tokenContract.balanceOf(destinationAddress, tokenId);
-        return {
-          tokenId,
-          balance: balance.toNumber(),
-          sufficient: balance.gte(amount)
-        };
-      } catch (error) {
-        return { tokenId, balance: 0, sufficient: false };
-      }
-    })
-  );
-  
-  const sufficientTokens = verificationResults.filter(r => r.sufficient);
-  const missingTokens = verificationResults
-    .filter(r => !r.sufficient)
-    .map(r => `${r.tokenId} (${r.balance}/${amount})`);
-  
-  console.log("ERC1155 verification result:", {
-    tokenAddress,
-    destinationAddress,
-    sufficientCount: sufficientTokens.length,
-    totalCount: tokenIds.length,
-    missingTokens
-  });
-  
-  let status: TokenTransferStatus = "awaiting_tokens";
-  
-  if (sufficientTokens.length === tokenIds.length) {
-    status = "completed";
-  } else if (sufficientTokens.length > 0) {
-    status = "verifying";
-  }
-  
-  return {
-    status,
-    currentAmount: sufficientTokens.length.toString(),
-    targetAmount: tokenIds.length.toString(),
-    missingTokens
-  };
 };
 
 /**
  * Generates a unique holding address for token transfers
- * This is a placeholder - in a real implementation, this would be a more
- * secure approach like creating a smart contract or using a multisig wallet
+ * @param provider Ethereum provider
+ * @param creatorAddress Address of the bounty creator
+ * @param bountyId Unique identifier for the bounty
+ * @returns Promise resolving to the holding contract address
  */
 export const generateHoldingAddress = async (
   provider: ethers.providers.Provider,
@@ -376,34 +116,30 @@ export const generateHoldingAddress = async (
       throw new Error("Provider must be a Web3Provider with a signer to deploy holding contracts");
     }
     
-    // Create factory contract instance
-    const factory = new ethers.Contract(
-      factoryAddress,
-      HOLDING_FACTORY_ABI,
-      signer
-    );
-    
-    // Check if a holding contract already exists for this creator and bounty
+    // Check if the contract was already deployed
+    const factory = new ethers.Contract(factoryAddress, HOLDING_FACTORY_ABI, provider);
     const existingAddress = await factory.getHoldingContract(creatorAddress, bountyId);
     
     if (existingAddress && existingAddress !== ethers.constants.AddressZero) {
-      console.log(`Existing holding contract found at ${existingAddress}`);
+      console.log("Found existing holding contract:", existingAddress);
       return existingAddress;
     }
     
     // Deploy a new holding contract
-    console.log(`Deploying new holding contract for bounty ${bountyId}`);
-    const tx = await factory.createHoldingContract(creatorAddress, bountyId);
+    const factoryWithSigner = factory.connect(signer);
+    const securityLevel = SECURITY_LEVELS.BASIC; // Default to basic security
+    
+    console.log(`Deploying holding contract for ${creatorAddress} and bounty ${bountyId}`);
+    const tx = await factoryWithSigner.deployHoldingContract(creatorAddress, bountyId, securityLevel);
     const receipt = await tx.wait();
     
-    // Extract the deployed contract address from event logs
-    let holdingAddress = ethers.constants.AddressZero;
-    
+    // Extract the deployed contract address from the transaction receipt
+    let deployedAddress = '';
     for (const log of receipt.logs) {
       try {
         const parsedLog = factory.interface.parseLog(log);
-        if (parsedLog.name === "HoldingContractCreated") {
-          holdingAddress = parsedLog.args.contractAddress;
+        if (parsedLog.name === 'HoldingContractDeployed') {
+          deployedAddress = parsedLog.args.contractAddress;
           break;
         }
       } catch (error) {
@@ -412,161 +148,372 @@ export const generateHoldingAddress = async (
       }
     }
     
-    if (holdingAddress === ethers.constants.AddressZero) {
-      throw new Error("Failed to extract holding contract address from transaction receipt");
+    if (!deployedAddress) {
+      throw new Error("Failed to extract deployed contract address from receipt");
     }
     
-    console.log(`Holding contract deployed at ${holdingAddress}`);
-    return holdingAddress;
+    console.log(`Holding contract deployed at ${deployedAddress}`);
+    return deployedAddress;
   } catch (error) {
-    console.error("Error generating secure holding address:", error);
-    // Fallback to deterministic address generation
-    console.warn("Falling back to deterministic address generation");
-    return generateDeterministicAddress(creatorAddress, bountyId);
+    console.error("Error generating holding address:", error);
+    throw new ProposalError({
+      category: 'transaction',
+      message: `Failed to generate holding address: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      recoverySteps: [
+        'Check your wallet connection',
+        'Make sure you have enough funds for gas',
+        'Try again later'
+      ]
+    });
   }
 };
 
 /**
- * Fallback method to generate a deterministic address from a hash
- * @param creatorAddress Address of the bounty creator
- * @param bountyId Unique identifier for the bounty
- * @returns A deterministic Ethereum address
+ * Generates a deterministic address using a hash of creator and bounty ID
+ * This is a fallback when no factory is available
  */
 const generateDeterministicAddress = (
   creatorAddress: string,
   bountyId: string
 ): string => {
-  const abiCoder = new ethers.utils.AbiCoder();
-  const encodedData = abiCoder.encode(
-    ["address", "string", "uint256"],
-    [creatorAddress, bountyId, Math.floor(Date.now() / 1000)]
+  // Create a hash of the creator address and bounty ID
+  const hash = ethers.utils.keccak256(
+    ethers.utils.defaultAbiCoder.encode(
+      ["address", "string"],
+      [creatorAddress, bountyId]
+    )
   );
   
-  const hash = ethers.utils.keccak256(encodedData);
-  const wallet = new ethers.Wallet(hash.slice(0, 66));
-  
-  console.warn(`Generated deterministic address ${wallet.address} - THIS IS NOT SECURE FOR PRODUCTION`);
-  return wallet.address;
+  // Use the hash to create a deterministic address
+  // This doesn't create a real contract, just a unique address
+  return ethers.utils.getAddress('0x' + hash.slice(-40));
 };
 
 /**
- * Adds an authorized user to a holding contract
- * @param provider Ethereum provider with signer
+ * Verifies if tokens have been transferred to a holding address
+ * @param provider Ethereum provider
+ * @param tokenConfig Token configuration details
  * @param holdingAddress Address of the holding contract
- * @param userAddress Address to authorize
- * @returns Promise resolving to the transaction receipt
+ * @returns Promise resolving to verification status
  */
-export const addAuthorizedUser = async (
-  provider: ethers.providers.Web3Provider,
-  holdingAddress: string,
-  userAddress: string
-): Promise<ethers.ContractReceipt> => {
+export const verifyTokenTransfer = async (
+  provider: ethers.providers.Provider,
+  tokenConfig: {
+    tokenAddress: string;
+    tokenType: "erc20" | "erc721" | "erc1155";
+    tokenIds?: string[];
+    amount?: number;
+  },
+  holdingAddress: string
+): Promise<{
+  status: TokenTransferStatus;
+  currentAmount: string;
+  targetAmount: string;
+  missingTokens?: string[];
+}> => {
   try {
-    const signer = provider.getSigner();
-    const holdingContract = new ethers.Contract(
-      holdingAddress,
-      HOLDING_CONTRACT_ABI,
-      signer
-    );
+    console.log("Verifying token transfer:", { tokenConfig, holdingAddress });
     
-    // Check if the address is a holding contract
-    if (await isHoldingContract(provider, holdingAddress)) {
-      const tx = await holdingContract.addAuthorizedUser(userAddress);
-      return await tx.wait();
-    } else {
-      throw new Error("The address is not a recognized holding contract");
+    // Verify the holding address is a contract
+    const isContract = await provider.getCode(holdingAddress);
+    if (isContract === '0x') {
+      return {
+        status: 'failed',
+        currentAmount: '0',
+        targetAmount: tokenConfig.amount?.toString() || '0',
+        missingTokens: []
+      };
     }
+    
+    // Different verification based on token type
+    if (tokenConfig.tokenType === "erc20") {
+      return await verifyERC20Transfer(provider, tokenConfig, holdingAddress);
+    } else if (tokenConfig.tokenType === "erc721" && tokenConfig.tokenIds) {
+      return await verifyERC721Transfer(provider, tokenConfig, holdingAddress);
+    } else if (tokenConfig.tokenType === "erc1155" && tokenConfig.tokenIds) {
+      return await verifyERC1155Transfer(provider, tokenConfig, holdingAddress);
+    }
+    
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: '0',
+      missingTokens: []
+    };
   } catch (error) {
-    console.error("Error adding authorized user:", error);
-    throw error;
+    console.error("Error verifying token transfer:", error);
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: tokenConfig.amount?.toString() || '0',
+      missingTokens: []
+    };
+  }
+};
+
+// Helper function to verify ERC20 token transfers
+const verifyERC20Transfer = async (
+  provider: ethers.providers.Provider,
+  tokenConfig: {
+    tokenAddress: string;
+    amount?: number;
+  },
+  holdingAddress: string
+): Promise<{
+  status: TokenTransferStatus;
+  currentAmount: string;
+  targetAmount: string;
+}> => {
+  try {
+    const token = new ethers.Contract(tokenConfig.tokenAddress, ERC20_ABI, provider);
+    const balance = await token.balanceOf(holdingAddress);
+    const decimals = await token.decimals();
+    
+    const targetAmount = tokenConfig.amount || 0;
+    const currentAmount = parseFloat(ethers.utils.formatUnits(balance, decimals));
+    
+    console.log(`ERC20 verification: ${currentAmount} / ${targetAmount}`);
+    
+    if (currentAmount >= targetAmount) {
+      return {
+        status: 'completed',
+        currentAmount: currentAmount.toString(),
+        targetAmount: targetAmount.toString()
+      };
+    } else if (currentAmount > 0) {
+      return {
+        status: 'verifying',
+        currentAmount: currentAmount.toString(),
+        targetAmount: targetAmount.toString()
+      };
+    }
+    
+    return {
+      status: 'awaiting_tokens',
+      currentAmount: '0',
+      targetAmount: targetAmount.toString()
+    };
+  } catch (error) {
+    console.error("Error verifying ERC20 transfer:", error);
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: tokenConfig.amount?.toString() || '0'
+    };
+  }
+};
+
+// Helper function to verify ERC721 token transfers
+const verifyERC721Transfer = async (
+  provider: ethers.providers.Provider,
+  tokenConfig: {
+    tokenAddress: string;
+    tokenIds?: string[];
+  },
+  holdingAddress: string
+): Promise<{
+  status: TokenTransferStatus;
+  currentAmount: string;
+  targetAmount: string;
+  missingTokens?: string[];
+}> => {
+  if (!tokenConfig.tokenIds || tokenConfig.tokenIds.length === 0) {
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: '0',
+      missingTokens: []
+    };
+  }
+  
+  try {
+    const token = new ethers.Contract(tokenConfig.tokenAddress, ERC721_ABI, provider);
+    const missingTokens: string[] = [];
+    let ownedCount = 0;
+    
+    // Check each token ID to see if it's owned by the holding address
+    for (const tokenId of tokenConfig.tokenIds) {
+      try {
+        const owner = await token.ownerOf(tokenId);
+        if (owner.toLowerCase() === holdingAddress.toLowerCase()) {
+          ownedCount++;
+        } else {
+          missingTokens.push(tokenId);
+        }
+      } catch (error) {
+        console.error(`Error checking ownership of token ${tokenId}:`, error);
+        missingTokens.push(tokenId);
+      }
+    }
+    
+    const totalTokens = tokenConfig.tokenIds.length;
+    
+    console.log(`ERC721 verification: ${ownedCount} / ${totalTokens}`);
+    
+    if (ownedCount === totalTokens) {
+      return {
+        status: 'completed',
+        currentAmount: ownedCount.toString(),
+        targetAmount: totalTokens.toString()
+      };
+    } else if (ownedCount > 0) {
+      return {
+        status: 'verifying',
+        currentAmount: ownedCount.toString(),
+        targetAmount: totalTokens.toString(),
+        missingTokens
+      };
+    }
+    
+    return {
+      status: 'awaiting_tokens',
+      currentAmount: '0',
+      targetAmount: totalTokens.toString(),
+      missingTokens: tokenConfig.tokenIds
+    };
+  } catch (error) {
+    console.error("Error verifying ERC721 transfer:", error);
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: tokenConfig.tokenIds.length.toString(),
+      missingTokens: tokenConfig.tokenIds
+    };
+  }
+};
+
+// Helper function to verify ERC1155 token transfers
+const verifyERC1155Transfer = async (
+  provider: ethers.providers.Provider,
+  tokenConfig: {
+    tokenAddress: string;
+    tokenIds?: string[];
+    amount?: number;
+  },
+  holdingAddress: string
+): Promise<{
+  status: TokenTransferStatus;
+  currentAmount: string;
+  targetAmount: string;
+  missingTokens?: string[];
+}> => {
+  if (!tokenConfig.tokenIds || tokenConfig.tokenIds.length === 0) {
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: '0',
+      missingTokens: []
+    };
+  }
+  
+  try {
+    const token = new ethers.Contract(tokenConfig.tokenAddress, ERC1155_ABI, provider);
+    const missingTokens: string[] = [];
+    let totalOwned = 0;
+    
+    // Prepare arrays for batch balance check
+    const accounts = Array(tokenConfig.tokenIds.length).fill(holdingAddress);
+    const ids = tokenConfig.tokenIds.map(id => ethers.BigNumber.from(id));
+    
+    // Get balances for all token IDs at once
+    const balances = await token.balanceOfBatch(accounts, ids);
+    
+    // Process balances
+    for (let i = 0; i < tokenConfig.tokenIds.length; i++) {
+      const balance = balances[i];
+      const tokenId = tokenConfig.tokenIds[i];
+      
+      if (balance.gt(0)) {
+        totalOwned += 1;
+      } else {
+        missingTokens.push(tokenId);
+      }
+    }
+    
+    const totalTokens = tokenConfig.tokenIds.length;
+    
+    console.log(`ERC1155 verification: ${totalOwned} / ${totalTokens}`);
+    
+    if (totalOwned === totalTokens) {
+      return {
+        status: 'completed',
+        currentAmount: totalOwned.toString(),
+        targetAmount: totalTokens.toString()
+      };
+    } else if (totalOwned > 0) {
+      return {
+        status: 'verifying',
+        currentAmount: totalOwned.toString(),
+        targetAmount: totalTokens.toString(),
+        missingTokens
+      };
+    }
+    
+    return {
+      status: 'awaiting_tokens',
+      currentAmount: '0',
+      targetAmount: totalTokens.toString(),
+      missingTokens: tokenConfig.tokenIds
+    };
+  } catch (error) {
+    console.error("Error verifying ERC1155 transfer:", error);
+    return {
+      status: 'failed',
+      currentAmount: '0',
+      targetAmount: tokenConfig.tokenIds.length.toString(),
+      missingTokens: tokenConfig.tokenIds
+    };
   }
 };
 
 /**
- * Checks if an address is a valid holding contract
- * @param provider Ethereum provider
- * @param contractAddress Address to check
- * @returns Promise resolving to boolean indicating if the address is a holding contract
+ * Check token allowance for ERC20 tokens
  */
-export const isHoldingContract = async (
+export const checkTokenAllowance = async (
   provider: ethers.providers.Provider,
-  contractAddress: string
+  tokenAddress: string,
+  ownerAddress: string,
+  spenderAddress: string,
+  amount: string
 ): Promise<boolean> => {
   try {
-    const network = await provider.getNetwork();
-    const factoryAddress = HOLDING_FACTORY_ADDRESSES[network.chainId];
+    const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+    const allowance = await token.allowance(ownerAddress, spenderAddress);
+    const amountBN = ethers.utils.parseUnits(amount, await token.decimals());
     
-    if (!factoryAddress || factoryAddress === ethers.constants.AddressZero) {
-      // If no factory is deployed, we can't verify
-      return false;
-    }
-    
-    const factory = new ethers.Contract(
-      factoryAddress,
-      HOLDING_FACTORY_ABI,
-      provider
-    );
-    
-    return await factory.isHoldingContract(contractAddress);
+    return allowance.gte(amountBN);
   } catch (error) {
-    console.error("Error checking if address is a holding contract:", error);
+    console.error("Error checking token allowance:", error);
     return false;
   }
 };
 
 /**
- * Performs an emergency withdrawal from a holding contract
- * @param provider Ethereum provider with signer
- * @param holdingAddress Address of the holding contract
- * @param tokenAddress Address of the token to withdraw (use ethers.constants.AddressZero for ETH)
- * @param recipientAddress Address to send the withdrawn tokens to
- * @returns Promise resolving to the transaction receipt
+ * Perform emergency withdrawal from a holding contract
  */
 export const emergencyWithdraw = async (
   provider: ethers.providers.Web3Provider,
   holdingAddress: string,
   tokenAddress: string,
   recipientAddress: string
-): Promise<ethers.ContractReceipt> => {
-  try {
-    const signer = provider.getSigner();
-    const holdingContract = new ethers.Contract(
-      holdingAddress,
-      HOLDING_CONTRACT_ABI,
-      signer
-    );
-    
-    // Verify this is a valid holding contract
-    if (!(await isHoldingContract(provider, holdingAddress))) {
-      throw new Error("The address is not a recognized holding contract");
-    }
-    
-    // Verify the caller is authorized
-    const signerAddress = await signer.getAddress();
-    if (!(await holdingContract.isAuthorized(signerAddress))) {
-      throw new Error("Caller is not authorized to perform emergency withdrawals");
-    }
-    
-    const tx = await holdingContract.emergencyWithdraw(
-      tokenAddress,
-      recipientAddress
-    );
-    
-    return await tx.wait();
-  } catch (error) {
-    console.error("Error performing emergency withdrawal:", error);
-    throw error;
+): Promise<ethers.ContractTransaction> => {
+  if (!provider) {
+    throw new Error("Provider is required for emergency withdrawal");
   }
+  
+  const signer = provider.getSigner();
+  const holdingContract = new ethers.Contract(
+    holdingAddress,
+    HOLDING_CONTRACT_ABI,
+    signer
+  );
+  
+  console.log(`Performing emergency withdrawal of ${tokenAddress} to ${recipientAddress}`);
+  return await holdingContract.emergencyWithdraw(tokenAddress, recipientAddress);
 };
 
 /**
- * Withdraws tokens from a holding contract to a recipient
- * @param provider Ethereum provider with signer
- * @param holdingAddress Address of the holding contract
- * @param tokenAddress Address of the token to withdraw
- * @param recipientAddress Address to send the tokens to
- * @param amount Amount to withdraw (in token units)
- * @returns Promise resolving to the transaction receipt
+ * Withdraw tokens from a holding contract
  */
 export const withdrawToken = async (
   provider: ethers.providers.Web3Provider,
@@ -574,53 +521,28 @@ export const withdrawToken = async (
   tokenAddress: string,
   recipientAddress: string,
   amount: string
-): Promise<ethers.ContractReceipt> => {
-  try {
-    const signer = provider.getSigner();
-    const holdingContract = new ethers.Contract(
-      holdingAddress,
-      HOLDING_CONTRACT_ABI,
-      signer
-    );
-    
-    // Verify this is a valid holding contract
-    if (!(await isHoldingContract(provider, holdingAddress))) {
-      throw new Error("The address is not a recognized holding contract");
-    }
-    
-    // Verify the caller is authorized
-    const signerAddress = await signer.getAddress();
-    if (!(await holdingContract.isAuthorized(signerAddress))) {
-      throw new Error("Caller is not authorized to withdraw tokens");
-    }
-    
-    // Convert amount to wei
-    const amountWei = amount.includes('.')
-      ? ethers.utils.parseUnits(amount, 18)
-      : ethers.BigNumber.from(amount);
-    
-    // Perform the withdrawal
-    const tx = await holdingContract.withdrawToken(
-      tokenAddress,
-      recipientAddress,
-      amountWei
-    );
-    
-    return await tx.wait();
-  } catch (error) {
-    console.error("Error withdrawing tokens:", error);
-    throw error;
+): Promise<ethers.ContractTransaction> => {
+  if (!provider) {
+    throw new Error("Provider is required for token withdrawal");
   }
+  
+  const signer = provider.getSigner();
+  const holdingContract = new ethers.Contract(
+    holdingAddress,
+    HOLDING_CONTRACT_ABI,
+    signer
+  );
+  
+  const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+  const decimals = await token.decimals();
+  const parsedAmount = ethers.utils.parseUnits(amount, decimals);
+  
+  console.log(`Withdrawing ${amount} tokens from ${holdingAddress} to ${recipientAddress}`);
+  return await holdingContract.withdraw(tokenAddress, recipientAddress, parsedAmount);
 };
 
 /**
- * Withdraws an ERC721 token from a holding contract
- * @param provider Ethereum provider with signer
- * @param holdingAddress Address of the holding contract
- * @param tokenAddress Address of the ERC721 token
- * @param recipientAddress Address to send the token to
- * @param tokenId ID of the token to withdraw
- * @returns Promise resolving to the transaction receipt
+ * Withdraw an ERC721 token from a holding contract
  */
 export const withdrawERC721 = async (
   provider: ethers.providers.Web3Provider,
@@ -628,68 +550,44 @@ export const withdrawERC721 = async (
   tokenAddress: string,
   recipientAddress: string,
   tokenId: string
-): Promise<ethers.ContractReceipt> => {
-  try {
-    const signer = provider.getSigner();
-    const holdingContract = new ethers.Contract(
-      holdingAddress,
-      HOLDING_CONTRACT_ABI,
-      signer
-    );
-    
-    // Verify this is a valid holding contract
-    if (!(await isHoldingContract(provider, holdingAddress))) {
-      throw new Error("The address is not a recognized holding contract");
-    }
-    
-    // Verify the caller is authorized
-    const signerAddress = await signer.getAddress();
-    if (!(await holdingContract.isAuthorized(signerAddress))) {
-      throw new Error("Caller is not authorized to withdraw tokens");
-    }
-    
-    // Perform the withdrawal
-    const tx = await holdingContract.withdrawERC721(
-      tokenAddress,
-      recipientAddress,
-      ethers.BigNumber.from(tokenId)
-    );
-    
-    return await tx.wait();
-  } catch (error) {
-    console.error("Error withdrawing ERC721 token:", error);
-    throw error;
+): Promise<ethers.ContractTransaction> => {
+  if (!provider) {
+    throw new Error("Provider is required for NFT withdrawal");
   }
+  
+  const signer = provider.getSigner();
+  const holdingContract = new ethers.Contract(
+    holdingAddress,
+    HOLDING_CONTRACT_ABI,
+    signer
+  );
+  
+  console.log(`Withdrawing NFT ${tokenId} from ${holdingAddress} to ${recipientAddress}`);
+  return await holdingContract.withdrawERC721(tokenAddress, recipientAddress, tokenId);
 };
 
-// Holding contract factory ABI - used to deploy secure holding contracts
-const HOLDING_FACTORY_ABI = [
-  "function createHoldingContract(address creator, string memory bountyId) external returns (address)",
-  "function getHoldingContract(address creator, string memory bountyId) external view returns (address)",
-  "function isHoldingContract(address contractAddress) external view returns (bool)"
-];
-
-// Holding contract ABI - used to interact with deployed holding contracts
-const HOLDING_CONTRACT_ABI = [
-  "function creator() external view returns (address)",
-  "function bountyId() external view returns (string memory)",
-  "function withdrawToken(address token, address recipient, uint256 amount) external",
-  "function withdrawETH(address payable recipient, uint256 amount) external",
-  "function withdrawERC721(address token, address recipient, uint256 tokenId) external",
-  "function withdrawERC1155(address token, address recipient, uint256 tokenId, uint256 amount) external",
-  "function emergencyWithdraw(address token, address payable recipient) external",
-  "function addAuthorizedUser(address user) external",
-  "function removeAuthorizedUser(address user) external",
-  "function isAuthorized(address user) external view returns (bool)"
-];
-
-// Addresses of deployed factory contracts on different networks
-const HOLDING_FACTORY_ADDRESSES: { [chainId: number]: string } = {
-  1: "0x1ca20040ce6ad406bc2a6c89976388829e7fbade", // Ethereum Mainnet
-  5: "0x753e22d4e112a4d8b07df9c4c578b116e3b48792", // Goerli
-  137: "0xcEDe25DF327bD1619Fe25CDa2292e14edAC30717", // Polygon Mainnet
-  80001: "0x1b0e8E8DC71b29CE49038569dEF1B3Bc0120F602", // Mumbai Testnet
-  8453: "0x0b7b86DCEAa8015CeD8F625d3b7A961b31fB05FE", // Base Mainnet
-  84531: "0x510c2F7e19a8f2537A3fe3Cf847e6583b993FA60", // Base Goerli Testnet
-  // Add other networks as needed
+/**
+ * Withdraw an ERC1155 token from a holding contract
+ */
+export const withdrawERC1155 = async (
+  provider: ethers.providers.Web3Provider,
+  holdingAddress: string,
+  tokenAddress: string,
+  recipientAddress: string,
+  tokenId: string,
+  amount: number = 1
+): Promise<ethers.ContractTransaction> => {
+  if (!provider) {
+    throw new Error("Provider is required for token withdrawal");
+  }
+  
+  const signer = provider.getSigner();
+  const holdingContract = new ethers.Contract(
+    holdingAddress,
+    HOLDING_CONTRACT_ABI,
+    signer
+  );
+  
+  console.log(`Withdrawing ${amount} units of ERC1155 token ${tokenId} from ${holdingAddress} to ${recipientAddress}`);
+  return await holdingContract.withdrawERC1155(tokenAddress, recipientAddress, tokenId, amount);
 };

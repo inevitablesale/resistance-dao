@@ -72,6 +72,7 @@ export function getTokenTransferStatusMessage(status: TokenTransferStatus): stri
       return 'Token transfer verified!';
     case 'failed':
       return 'Token transfer failed. Please try again.';
+    case 'not_started':
     default:
       return 'Ready to receive tokens';
   }
