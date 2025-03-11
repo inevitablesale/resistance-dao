@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ethers } from "ethers";
@@ -42,4 +41,21 @@ export function truncateAddress(address: string, startChars: number = 6, endChar
   if (address.length <= startChars + endChars) return address;
   
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
+}
+
+/**
+ * Shortens an Ethereum address for display purposes
+ * @param address The full Ethereum address to shorten
+ * @param chars Number of characters to keep at each end (default: 4)
+ * @returns Shortened address in the format 0x1234...5678
+ */
+export function shortenAddress(address: string, chars = 4): string {
+  if (!address) return '';
+  
+  // Validate address format
+  if (!address.startsWith('0x') || address.length !== 42) {
+    return address;
+  }
+  
+  return `${address.substring(0, chars + 2)}...${address.substring(42 - chars)}`;
 }

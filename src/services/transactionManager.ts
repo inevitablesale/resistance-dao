@@ -10,6 +10,8 @@ export type TransactionType =
   | 'erc20_approval'
   | 'erc20_transfer'
   | 'erc721_mint'
+  | 'erc721_transfer'
+  | 'erc1155_transfer'
   | 'proposal'
   | 'contract';
 
@@ -54,6 +56,14 @@ export const executeTransaction = async (
     tokenConfig: config.tokenConfig,
     nftConfig: config.nftConfig
   });
+
+  // Add specific validation for NFT transactions
+  if ((config.type === 'erc721_mint' || config.type === 'erc721_transfer' || config.type === 'erc1155_transfer') 
+      && config.nftConfig && provider) {
+    console.log('NFT transaction config:', config.nftConfig);
+    const network = await provider.getNetwork();
+    console.log('NFT transaction on network:', network.name, network.chainId);
+  }
 
   if (config.type === 'erc20_approval' && config.tokenConfig) {
     console.log('Token approval config:', config.tokenConfig);

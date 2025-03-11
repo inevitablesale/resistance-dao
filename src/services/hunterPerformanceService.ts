@@ -1,5 +1,5 @@
 
-import { BountyMetadata, HunterTierLevel } from "@/types/content";
+import { BountyMetadata, HunterTierLevel, PerformanceMultipliers } from "@/types/content";
 
 /**
  * Calculate the reward multiplier for a hunter based on their performance
