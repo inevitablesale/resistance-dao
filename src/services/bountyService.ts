@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
 import { toast } from "@/hooks/use-toast";
+import { createBountyParty, createEthCrowdfund } from "./partyProtocolService";
+import { uploadToIPFS } from "./ipfsService";
 
 // Mock data for development
 const BOUNTIES_DATA = [
@@ -80,6 +82,8 @@ export interface Bounty {
   maxReferralsPerHunter: number;
   bountyType: "nft_referral" | "token_referral" | "social_media";
   remainingBudget?: number;
+  crowdfundAddress?: string | null;
+  metadataURI?: string | null;
 }
 
 export interface BountyCreationParams {
@@ -170,7 +174,9 @@ export const createBounty = async (
       allowPublicHunters: params.allowPublicHunters,
       maxReferralsPerHunter: params.maxReferralsPerHunter,
       bountyType: params.bountyType,
-      remainingBudget: params.totalBudget // Initial remaining budget
+      remainingBudget: params.totalBudget, // Initial remaining budget
+      crowdfundAddress: null,
+      metadataURI: null
     };
     
     // Add to our mock data
@@ -189,7 +195,7 @@ export const createBounty = async (
 export const deployBountyToBlockchain = async (
   bountyId: string,
   wallet: any
-): Promise<{ partyAddress: string }> => {
+): Promise<{ partyAddress: string; crowdfundAddress?: string }> => {
   console.log(`Deploying bounty ${bountyId} to blockchain`);
   
   if (!wallet) {
@@ -215,51 +221,88 @@ export const deployBountyToBlockchain = async (
       throw new Error("Bounty already deployed");
     }
     
-    // Initialize wallet client and provider
-    try {
-      // Get wallet client directly from wallet object
-      console.log("Getting wallet client for deployment");
-      const walletClient = await wallet.getWalletClient();
+    // Prepare Party Protocol options for bounty
+    const now = Math.floor(Date.now() / 1000);
+    const bountyPartyOptions = {
+      name: `Bounty: ${bountyToDeploy.name}`,
+      hosts: [await wallet.getWalletClient().getAddress()], // Bounty creator as host
+      votingDuration: 60 * 60 * 24 * 3, // 3 days
+      executionDelay: 60 * 60 * 24, // 1 day
+      passThresholdBps: 5000, // 50%
+      allowPublicProposals: false, // Only hosts can make proposals
+      description: bountyToDeploy.description,
       
-      if (!walletClient) {
-        throw new Error("Failed to get wallet client");
-      }
-      
-      // Create ethers provider from wallet client
-      const provider = new ethers.providers.Web3Provider(walletClient);
-      const signer = provider.getSigner();
-      
-      // Verify we can get signer address
-      const signerAddress = await signer.getAddress();
-      console.log("Deploying with signer address:", signerAddress);
-      
-      // Simulate blockchain deployment
-      // In a real implementation, this would call a smart contract deployment function
-      // For now, just wait and update the mock data
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Generate a mock address
-      const mockPartyAddress = `0x${Math.random().toString(16).substring(2, 42).padStart(40, '0')}`;
-      
-      // Update the bounty with the new party address
-      const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
-      if (bountyIndex !== -1) {
-        BOUNTIES_DATA[bountyIndex].partyAddress = mockPartyAddress;
-      }
-      
-      return { partyAddress: mockPartyAddress };
-    } catch (error) {
-      console.error("Error initializing wallet for deployment:", error);
-      throw new ProposalError({
-        category: 'initialization',
-        message: 'Failed to initialize wallet',
-        recoverySteps: [
-          'Make sure your wallet is unlocked',
-          'Try refreshing the page',
-          'Try reconnecting your wallet'
-        ]
-      });
+      // Bounty-specific options
+      rewardAmount: bountyToDeploy.rewardAmount,
+      maxParticipants: 1000, // Arbitrary large number
+      startTime: now,
+      endTime: bountyToDeploy.expiresAt,
+      verificationRequired: bountyToDeploy.requireVerification,
+      targetRequirements: bountyToDeploy.eligibleNFTs
+    };
+    
+    // Upload bounty metadata to IPFS
+    const bountyMetadata = {
+      name: bountyToDeploy.name,
+      description: bountyToDeploy.description,
+      bountyType: bountyToDeploy.bountyType,
+      rewardAmount: bountyToDeploy.rewardAmount,
+      totalBudget: bountyToDeploy.totalBudget,
+      allowPublicHunters: bountyToDeploy.allowPublicHunters,
+      maxReferralsPerHunter: bountyToDeploy.maxReferralsPerHunter,
+      requireVerification: bountyToDeploy.requireVerification,
+      eligibleNFTs: bountyToDeploy.eligibleNFTs,
+      createdAt: now,
+      expiresAt: bountyToDeploy.expiresAt
+    };
+    
+    const metadataURI = await uploadToIPFS(bountyMetadata);
+    console.log("Bounty metadata uploaded to IPFS:", metadataURI);
+    
+    // Step 1: Create the Bounty Party
+    console.log("Creating bounty party on Party Protocol...");
+    const partyAddress = await createBountyParty(wallet, {
+      ...bountyPartyOptions,
+      metadataURI
+    });
+    
+    console.log(`Bounty party created at address: ${partyAddress}`);
+    
+    // Step 2: Create ETH Crowdfund for the party to manage bounty funds
+    console.log("Creating ETH crowdfund for bounty...");
+    
+    const walletClient = await wallet.getWalletClient();
+    const userAddress = await walletClient.getAddress();
+    
+    const crowdfundOptions = {
+      initialContributor: userAddress,
+      minContribution: "0.01", // Small minimum to allow most users
+      maxContribution: bountyToDeploy.totalBudget.toString(), // Full budget amount
+      maxTotalContributions: (bountyToDeploy.totalBudget * 2).toString(), // Allow for additional funding
+      duration: bountyToDeploy.expiresAt - now // Duration until expiry
+    };
+    
+    const crowdfundAddress = await createEthCrowdfund(
+      wallet,
+      partyAddress,
+      crowdfundOptions,
+      bountyMetadata
+    );
+    
+    console.log(`Bounty crowdfund created at address: ${crowdfundAddress}`);
+    
+    // Update the bounty with the new addresses
+    const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+    if (bountyIndex !== -1) {
+      BOUNTIES_DATA[bountyIndex].partyAddress = partyAddress;
+      BOUNTIES_DATA[bountyIndex].crowdfundAddress = crowdfundAddress;
+      BOUNTIES_DATA[bountyIndex].metadataURI = metadataURI;
     }
+    
+    return { 
+      partyAddress, 
+      crowdfundAddress 
+    };
   } catch (error) {
     console.error("Error deploying bounty:", error);
     
@@ -322,7 +365,18 @@ export const distributeRewards = async (
       return { success: false, error: "Wallet not connected" };
     }
     
-    // Simulate a delay for blockchain transaction
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    if (!bounty.partyAddress) {
+      return { success: false, error: "Bounty must be deployed to blockchain first" };
+    }
+    
+    // In a real implementation, this would create a Party Protocol proposal
+    // to distribute rewards to successful referrers
+    // For now, just simulate a delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     return { success: true };
@@ -347,6 +401,13 @@ export const updateBountyStatus = async (
       return { success: false, error: "Wallet not connected" };
     }
     
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    // If the bounty is deployed to a Party, we would need to create a proposal
+    // to update its status on-chain. For now, just update the mock data.
     const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
     if (bountyIndex !== -1) {
       BOUNTIES_DATA[bountyIndex].status = newStatus;
@@ -379,11 +440,24 @@ export const fundBounty = async (
       return { success: false, error: "Wallet not connected" };
     }
     
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    // If the bounty has a crowdfund address, we would contribute to it
+    // For now, just update the mock data
     const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
     if (bountyIndex !== -1) {
       BOUNTIES_DATA[bountyIndex].totalBudget += additionalFunds;
     } else {
       return { success: false, error: "Bounty not found" };
+    }
+    
+    // If the bounty is deployed, send a real transaction to the crowdfund
+    if (bounty.crowdfundAddress) {
+      console.log(`Would send ${additionalFunds} to crowdfund at ${bounty.crowdfundAddress}`);
+      // In a real implementation, we would call sentinelContributeToParty here
     }
     
     // Simulate a delay for blockchain transaction
